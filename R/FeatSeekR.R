@@ -14,6 +14,7 @@ filter <- function(data, filter_thr){
   # get mean of pairwise correlation between replicates, i.e. the off-diagonal values of the correlation matrix
   cor_raw <- apply(data,3, function(x) mean(cor(x, use="pairwise.complete.obs")[upper.tri(!diag(nrow=dim(data)[2]))]))
   include <-  cor_raw > filter_thr
+  features <- dimnames(data)[[3]]
   # check if preselected features would be filtered out and issue a warning
   if(any(!preselected %in% features[include]))
     warning("The following preselected features have replicate correlation lower than filter_thr:\n",
@@ -92,6 +93,7 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5) {
       features <- dimnames(data)[[3]]
       d <- list()
       # fit linear model for each replicate and overwrite data with residuals
+      s <- sel[,1:(k-1), drop = FALSE]
       for (j in seq_len(r)){
         model = lm(data[, j, ] ~ s + 0, na.action = na.exclude)
         resids <- array(NA, dim(data[, j,]))
@@ -107,8 +109,7 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5) {
         names(metric) <- dimnames(data)[[3]]
         # select feature whose residuals have the highest correlation
         I = names(metric)[which.max(metric)]
-      }
-      if (k <= length(preselected)) {
+      } else{
         # first features are set to preselected ones
         I = preselected[k]
       }
@@ -135,5 +136,5 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5) {
       nonzero_residuals <- FALSE
     }
   }
-  return(res)
+  return(res[1:(k-1),])
 }

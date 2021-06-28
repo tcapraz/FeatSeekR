@@ -4,21 +4,16 @@
 \alias{FeatSeek}
 \title{FeatSeek algorithm}
 \usage{
-FeatSeek(data, preselected, max_p, filter_thr = 0.5, lambda = 0.5, threads = 1)
+FeatSeek(data, preselected, max_features, filter_thr = 0.5)
 }
 \arguments{
 \item{data}{3 dimensional array with samples $\times$ replicates x features.}
 
 \item{preselected}{vector with names of preselected features.}
 
-\item{max_p}{integer number of features to rank}
+\item{max_features}{integer number of features to rank}
 
 \item{filter_thr}{float between 0 and 1. Features with correlation < filter_thr are removed .}
-
-\item{lambda}{float between 0 and 1. Setting the tradeoff between variance explained and redundancy
-if lambda = 1 only the consistency of residuals between replicates is considered feature selection.}
-
-\item{threads}{int that specifies how many cores to use}
 }
 \value{
 Dataframe with selected features, rmsd, 1/VIF and variance explained for the selection process
