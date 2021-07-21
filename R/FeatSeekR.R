@@ -1,16 +1,28 @@
 
 calc_metric <- function(data,r){
   feat_cor <- cor(data, use="pairwise.complete.obs")
+  feat_cor[is.na(feat_cor)] <- 0
   negative <-  any(feat_cor < 0)
   res <-   mean(feat_cor[upper.tri(!diag(nrow=r))])
   if (negative == TRUE){
-    res <- res*-1
+    res <- sign(res)*-1*res
   }
   res
 }
 
 filter <- function(data, filter_thr){
   message("Filtering out features with low initial correlation across replicates....")
+  # drop features with sd == 0
+
+  sdl <- lapply(seq_len(dim(data)[2]), function(i, data) {
+    apply(data[, i, ], 2, function(x)
+      sd(x))
+  }, data = data)
+  zeros <- lapply(sdl, function(i){
+    i == 0
+  })
+  zeros <- Reduce("|", zeros)
+  data <- data[,,!zeros]
   # get mean of pairwise correlation between replicates, i.e. the off-diagonal values of the correlation matrix
   cor_raw <- apply(data,3, function(x) mean(cor(x, use="pairwise.complete.obs")[upper.tri(!diag(nrow=dim(data)[2]))]))
   include <-  cor_raw > filter_thr
@@ -21,6 +33,7 @@ filter <- function(data, filter_thr){
             paste(preselected[!preselected %in% features[include]],collapse=","),
             "\nConsider removing them!")
   features <- union(features[include], preselected)
+  features <- features[!is.na(features)]
   data <- data[, , features]
   p <- dim(data)[3] # get number of features
   remaining_feat <- dimnames(data)[3]
@@ -40,11 +53,11 @@ filter <- function(data, filter_thr){
 #' @param preselected vector with names of preselected features.
 #' @param max_features integer number of features to rank
 #' @param filter_thr float between 0 and 1. Features with correlation < filter_thr are removed .
-#'
+#' @param stop_thr float between 0 and 1. Stops feature selection if ratio of positive correlations of remaining features is <= stop_thr
 #' @return Dataframe with selected features, rmsd, 1/VIF and variance explained for the selection process
 #'
 #' @export
-FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5) {
+FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr=0.5) {
 
   n <- dim(data)[1]
   r <- dim(data)[2]
@@ -125,7 +138,7 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5) {
       res$ratio_positive[k] <- ratio_positive
       message("k=",k," selected = ",res$selected[k],", metric = ",res$metric[k], ", ratio positive = ", res$ratio_positive[k])
       ratio_positive <- sum(metric>0)/length(metric)
-      if (ratio_positive <= 0.5) {
+      if (ratio_positive <= stop_thr) {
         continue <- FALSE
         message(paste0("Stopping selection procedure as ratio of positive correlations <= 0.5!"))
       }

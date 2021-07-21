@@ -4,7 +4,7 @@
 \alias{FeatSeek}
 \title{FeatSeek algorithm}
 \usage{
-FeatSeek(data, preselected, max_features, filter_thr = 0.5)
+FeatSeek(data, preselected, max_features, filter_thr = 0.5, stop_thr = 0.5)
 }
 \arguments{
 \item{data}{3 dimensional array with samples $\times$ replicates x features.}
@@ -14,6 +14,8 @@ FeatSeek(data, preselected, max_features, filter_thr = 0.5)
 \item{max_features}{integer number of features to rank}
 
 \item{filter_thr}{float between 0 and 1. Features with correlation < filter_thr are removed .}
+
+\item{stop_thr}{float between 0 and 1. Stops feature selection if ratio of positive correlations of remaining features is <= stop_thr}
 }
 \value{
 Dataframe with selected features, rmsd, 1/VIF and variance explained for the selection process
