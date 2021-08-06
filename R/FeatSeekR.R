@@ -8,6 +8,7 @@ calc_metric <- function(data,r){
     res <- sign(res)*-1*res
   }
   res
+
 }
 
 filter <- function(data, filter_thr){
@@ -90,10 +91,15 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
     data.frame(
       metric = rep(NA, max_features),    # selection metric for each iteration
       selected = rep("", max_features),  # name of selected features
-      ratio_positive = rep(NA, max_features) # ratio of positive correlations
+      ratio_positive = rep(NA, max_features), # ratio of positive correlations
+      ks_stat = rep(NA, max_features),
+      ks_pval =rep(NA, max_features)
     )
+  allmetrics <- list()
+  datalist <- list()
   # initialize matrix of selected features
   sel <- matrix(NA, nrow=n, ncol=max_features)
+  #sel <- lapply(seq_len(r), function(x) matrix(NA, nrow=n, ncol=max_features))
   k <- 1
   nonzero_residuals <- TRUE
   continue <- TRUE
@@ -108,6 +114,7 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
       # fit linear model for each replicate and overwrite data with residuals
       s <- sel[,1:(k-1), drop = FALSE]
       for (j in seq_len(r)){
+        #s <- sel[[r]][,1:(k-1), drop = FALSE]
         model = lm(data[, j, ] ~ s + 0, na.action = na.exclude)
         resids <- array(NA, dim(data[, j,]))
         resids[!is.na(data[, j,])] <- model$residuals
@@ -115,9 +122,23 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
       }
     }
     if(!all(data==0)) {
+      datalist[[k]] <- data
       # calculate mean pairwise correlations between all replicates
       # set to negative if one pair is negatively correlated
       metric <- apply(data, 3, calc_metric, r=r)
+      allmetrics[[k]] <- metric
+      # KS statistic to compare distribution of metrics to previous iteration
+      if (k>1){
+        metric_std <- scale(metric)
+
+        ks <- ks.test(metric_std, pnorm)
+
+        res$ks_stat[k] <- ks$statistic
+        res$ks_pval[k] <- ks$p.value
+
+      }
+
+
       if (k > length(preselected)) {
         names(metric) <- dimnames(data)[[3]]
         # select feature whose residuals have the highest correlation
@@ -132,6 +153,10 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
       res$selected[k] <- I
       # add mean between replicates to selected subset
       sel[, k] = apply(data[, , I, drop = FALSE], 1, mean, na.rm = TRUE)
+      # for (i in seq_len(r)){
+      #   sel[[i]][, k] <- data[,i, I, drop = FALSE]
+      # }
+
       # drop selected feature from data
       data = data[, , dimnames(data)[[3]] != I, drop = FALSE]
       ratio_positive <- sum(metric>0)/length(metric)
@@ -149,5 +174,5 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
       nonzero_residuals <- FALSE
     }
   }
-  return(res[1:(k-1),])
+  return(list(res[1:(k-1),], allmetrics, data, sel, datalist))
 }
