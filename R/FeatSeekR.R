@@ -11,6 +11,15 @@ calc_metric <- function(data,r){
 
 }
 
+calc_metric_all <- function(data,r){
+  feat_cor <- cor(data, use="pairwise.complete.obs")
+  feat_cor[is.na(feat_cor)] <- 0
+
+  res <- feat_cor[upper.tri(!diag(nrow=r))]
+
+  res
+}
+
 filter <- function(data, filter_thr){
   message("Filtering out features with low initial correlation across replicates....")
   # drop features with sd == 0
@@ -126,7 +135,7 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
       # calculate mean pairwise correlations between all replicates
       # set to negative if one pair is negatively correlated
       metric <- apply(data, 3, calc_metric, r=r)
-      allmetrics[[k]] <- metric
+      allmetrics[[k]] <- as.vector(apply(data, 3, calc_metric_all, r=r))
       # KS statistic to compare distribution of metrics to previous iteration
       if (k>1){
         metric_std <- scale(metric)
@@ -174,5 +183,5 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
       nonzero_residuals <- FALSE
     }
   }
-  return(list(res[1:(k-1),], allmetrics, data, sel, datalist))
+  return(list(res[1:(k-1),], allmetrics))
 }
