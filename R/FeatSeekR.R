@@ -23,7 +23,6 @@ calc_metric_all <- function(data,r){
 filter <- function(data, filter_thr){
   message("Filtering out features with low initial correlation across replicates....")
   # drop features with sd == 0
-
   sdl <- lapply(seq_len(dim(data)[2]), function(i, data) {
     apply(data[, i, ], 2, function(x)
       sd(x))
@@ -34,19 +33,18 @@ filter <- function(data, filter_thr){
   zeros <- Reduce("|", zeros)
   data <- data[,,!zeros]
   # get mean of pairwise correlation between replicates, i.e. the off-diagonal values of the correlation matrix
-  cor_raw <- apply(data,3, function(x) mean(cor(x, use="pairwise.complete.obs")[upper.tri(!diag(nrow=dim(data)[2]))]))
-  include <-  cor_raw > filter_thr
+  cor <- apply(data,3, function(x) mean(cor(x, use="pairwise.complete.obs")[upper.tri(!diag(nrow=dim(data)[2]))]))
+  keep <-  cor_raw > filter_thr
   features <- dimnames(data)[[3]]
   # check if preselected features would be filtered out and issue a warning
-  if(any(!preselected %in% features[include]))
+  if(any(!preselected %in% features[keep]))
     warning("The following preselected features have replicate correlation lower than filter_thr:\n",
-            paste(preselected[!preselected %in% features[include]],collapse=","),
+            paste(preselected[!preselected %in% features[keep]],collapse=","),
             "\nConsider removing them!")
-  features <- union(features[include], preselected)
+  features <- union(features[keep], preselected)
   features <- features[!is.na(features)]
   data <- data[, , features]
-  p <- dim(data)[3] # get number of features
-  remaining_feat <- dimnames(data)[3]
+  p <- dim(data)[3] # get number of remaining features
   message(paste("Remaining features:", p))
   data
 }
@@ -55,19 +53,17 @@ filter <- function(data, filter_thr){
 #' @title FeatSeek algorithm
 #' @name FeatSeek
 #' @description This function ranks features of a 3 dimensional array according to their consistency between replicates.
-#' After the ranking procedure the optimal subset of features is determined by maximizing the inverse of the variance inflation factor (VIF)
-#' and the fraction of variance of the remaining features that can be explained by the selected ones. The VIF is a measure for collinearity
-#' in linear regression, the higher the inverse of VIF the lower the redundancy.
+#'
+#'
 #'
 #' @param data 3 dimensional array with samples $\times$ replicates x features.
 #' @param preselected vector with names of preselected features.
 #' @param max_features integer number of features to rank
 #' @param filter_thr float between 0 and 1. Features with correlation < filter_thr are removed .
-#' @param stop_thr float between 0 and 1. Stops feature selection if ratio of positive correlations of remaining features is <= stop_thr
 #' @return Dataframe with selected features, rmsd, 1/VIF and variance explained for the selection process
 #'
 #' @export
-FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr=0.5) {
+FeatSeek <- function(data,  max_features, preselected=NULL, filter_thr = NULL, stop_thr=0.5, ret_data=FALSE) {
 
   n <- dim(data)[1]
   r <- dim(data)[2]
@@ -86,12 +82,15 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
     stop("No feature names given or features not in correct dimension of data array!")
   }
 
-  if(!all(preselected %in% features)){
+  if(!is.null(preselected) & !all(preselected %in% features)){
     stop("Could not find preselected features in data!")
   }
-
+  if (is.null(preselected)){
+    cor <- apply(data,3, function(x) mean(cor(x, use="pairwise.complete.obs")[upper.tri(!diag(nrow=dim(data)[2]))]))
+    names(which.max(cor))
+  }
   # remove features with correlation < filter_thr
-  if(filter_thr>0){
+  if(!is.null(filter_thr)){
     data <- filter(data, filter_thr)
   }
 
@@ -100,15 +99,14 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
     data.frame(
       metric = rep(NA, max_features),    # selection metric for each iteration
       selected = rep("", max_features),  # name of selected features
-      ratio_positive = rep(NA, max_features), # ratio of positive correlations
       ks_stat = rep(NA, max_features),
-      ks_pval =rep(NA, max_features)
+      rec_error = rep(NA, max_features),
+      svd_entropy = rep(NA, max_features)
     )
   allmetrics <- list()
-  datalist <- list()
+  alldata <- list()
   # initialize matrix of selected features
   sel <- matrix(NA, nrow=n, ncol=max_features)
-  #sel <- lapply(seq_len(r), function(x) matrix(NA, nrow=n, ncol=max_features))
   k <- 1
   nonzero_residuals <- TRUE
   continue <- TRUE
@@ -130,8 +128,9 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
         data[, j, ] = ifelse(abs(resids)<10^(-10), 0, resids)
       }
     }
+    alldata[[k]] <- data
     if(!all(data==0)) {
-      datalist[[k]] <- data
+
       # calculate mean pairwise correlations between all replicates
       # set to negative if one pair is negatively correlated
       metric <- apply(data, 3, calc_metric, r=r)
@@ -162,9 +161,6 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
       res$selected[k] <- I
       # add mean between replicates to selected subset
       sel[, k] = apply(data[, , I, drop = FALSE], 1, mean, na.rm = TRUE)
-      # for (i in seq_len(r)){
-      #   sel[[i]][, k] <- data[,i, I, drop = FALSE]
-      # }
 
       # drop selected feature from data
       data = data[, , dimnames(data)[[3]] != I, drop = FALSE]
@@ -183,5 +179,10 @@ FeatSeek <- function(data, preselected, max_features, filter_thr = 0.5, stop_thr
       nonzero_residuals <- FALSE
     }
   }
-  return(list(res[1:(k-1),], allmetrics))
+  if (ret_data ==TRUE){
+    return(list(res[1:(k-1),], allmetrics, alldata, sel))
+  }
+  else{
+    return(list(res[1:(k-1),], allmetrics))
+  }
 }
