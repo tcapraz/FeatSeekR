@@ -1,22 +1,19 @@
 Package: FeatSeekR
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Title: FeatSeekR an R package for unsupervised feature selection
+Version: 0.99.0
+Authors@R: person("Tuemay", "Capraz",
+  email = "tuemay.capraz@embl.de",
+  role = c("cre", "aut"),
+  comment = c(ORCID = "0000-0002-2547-067X" ))
+Description: FeatSeekR performs unsupervised feature selection using replicated measurements. It iteratively selects features with the highest consistency across replicates, after projecting out those dimensions from the data that are spanned by the previously selected features. The selected a set of features has a high replicate consistency and a high degree of uniqueness. 
 License: What license is it under?
 Encoding: UTF-8
-LazyData: true
 Imports:
-        foreach,
-        doParallel,
-        tidyverse,
-        MASS,
-        abind,
-        ggplot2,
-        cowplot,
-        BiocParallel,
-        iterators
-RoxygenNote: 7.1.1
+        abind
+RoxygenNote: 7.1.2
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr
+biocViews: Software, StatisticalMethod, FeatureExtraction

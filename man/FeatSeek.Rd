@@ -2,27 +2,22 @@
 % Please edit documentation in R/FeatSeekR.R
 \name{FeatSeek}
 \alias{FeatSeek}
-\title{FeatSeek algorithm}
+\title{FeatSeek}
 \usage{
-FeatSeek(data, preselected, max_features, filter_thr = 0.5, stop_thr = 0.5)
+FeatSeek(data, max_features, init = NULL, filter_thr = NULL)
 }
 \arguments{
-\item{data}{3 dimensional array with samples $\times$ replicates x features.}
-
-\item{preselected}{vector with names of preselected features.}
+\item{data}{3 dimensional array with samples x features x replicates.}
 
 \item{max_features}{integer number of features to rank}
 
-\item{filter_thr}{float between 0 and 1. Features with correlation < filter_thr are removed .}
+\item{init}{vector with names of initial features. If NULL the feature with highest replicate correlation will be used.}
 
-\item{stop_thr}{float between 0 and 1. Stops feature selection if ratio of positive correlations of remaining features is <= stop_thr}
+\item{filter_thr}{float between 0 and 1. Features with correlation < filter_thr are removed .}
 }
 \value{
 Dataframe with selected features, rmsd, 1/VIF and variance explained for the selection process
 }
 \description{
 This function ranks features of a 3 dimensional array according to their consistency between replicates.
-After the ranking procedure the optimal subset of features is determined by maximizing the inverse of the variance inflation factor (VIF)
-and the fraction of variance of the remaining features that can be explained by the selected ones. The VIF is a measure for collinearity
-in linear regression, the higher the inverse of VIF the lower the redundancy.
 }
