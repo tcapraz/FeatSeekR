@@ -73,6 +73,7 @@ svd_entropy <- function(data, res){
         singv <- svd(Sdata)[[1]]
         singv.norm <- (singv ^ 2) / (sum(singv ^ 2))
         entropy[[i]] <- -1/log(length(singv.norm )) * sum(singv.norm *log(singv.norm ))
+        if (i ==1) entropy[[i]] <- 1
     }
     entropy
 }

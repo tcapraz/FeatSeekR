@@ -16,7 +16,10 @@ Suggests:
     rmarkdown,
     knitr,
     BiocStyle,
-    HD2013SGI,
+    DmelSGI,
+    resample,
+    pheatmap,
+    ggplot2,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 biocViews: Software, StatisticalMethod, FeatureExtraction
