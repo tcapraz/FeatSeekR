@@ -17,15 +17,27 @@ calc_metric <- function(data, r){
 
 
 #' @title FeatSeek
-#' @description This function ranks features of a 3 dimensional array according to their consistency between replicates.
+#' @description This function ranks features of a 3
+#' dimensional array according to their consistency between replicates.
 #'
 #'
 #'
-#' @param data 3 dimensional array with samples x features x replicates.
-#' @param init vector with names of initial features. If NULL the feature with highest replicate correlation will be used.
+#' @param data 3 dimensional array with samples x features x replicates
+#' @param init vector with names of initial features.
+#' If NULL the feature with highest replicate correlation will be used
 #' @param max_features integer number of features to rank
-#' @param filter_thr float between 0 and 1. Features with correlation < filter_thr are removed .
-#' @return Dataframe with selected features, rmsd, 1/VIF and variance explained for the selection process
+#' @param filter_thr float between 0 and 1.
+#' Features with correlation < filter_thr are removed
+#' @return Dataframe with selected feature names,
+#' replicate correlation and KS statistic
+#'
+#' @examples
+#' # run FeatSeek to select the top 20 features
+#' data <-  array(rnorm(50*30*2), dim=c(50,30,2),
+#' dimnames=list(NULL, paste("feature", seq_len(30)), NULL))
+#' res <- FeatSeek(data, max_features=20)
+#'
+#' # res stores the 20 selected features ranked by their replicate correlations
 #'
 #' @export
 FeatSeek <- function(data,  max_features, init=NULL, filter_thr = NULL) {
@@ -51,10 +63,11 @@ FeatSeek <- function(data,  max_features, init=NULL, filter_thr = NULL) {
         data.frame(
             metric = rep(NA, max_features),    # selection metric for each iteration
             selected = rep("", max_features),  # name of selected features
-            ks_stat = rep(NA, max_features)
+            ks_stat = rep(NA, max_features)    # ls statistic between current and initial distribution
         )
 
-    # calculate initial distribution of correlations for all features and replicates
+    # calculate initial distribution of correlations
+    # for all features and replicates
     initial_dist <- as.vector(apply(data, 2, calc_metric, r=r))
 
     # initialize matrix of selected features
@@ -69,23 +82,29 @@ FeatSeek <- function(data,  max_features, init=NULL, filter_thr = NULL) {
     message("Starting feature ranking!")
     while (k <= max_features & continue==TRUE & nonzero_residuals ==TRUE)  {
         if (k > 1) {
-            data <- fit_lm(data, S, k, r)
+            data <- fit_lm(data, S, k)
         }
         if(all(data==0)) {
             # if all residuals are close to zero stop selection procedure
             message(
-              "Stopping selection procedure with k=",
-              k - 1,
-              " features because remaining features are linear combinations of already selected features. Consider lowering max_features!"
+                "Stopping selection procedure with k=",
+                k - 1,
+                " features because remaining features are linear combinations
+                of already selected features. Consider lowering max_features!"
             )
             break
         }
         # calculate mean pairwise correlations between all replicates
         allmetrics <- apply(data, 2, calc_metric, r=r)
-        metric <-   colMeans(allmetrics)
+        if (length(dim(allmetrics))!=2) {
+            metric <-  allmetrics
+        } else {
+            metric <- colMeans(allmetrics)}
 
         # KS statistic to compare distribution of metrics to previous iteration
-        ks <- stats::ks.test(as.vector(allmetrics), initial_dist)
+        # suppress warning regarding exact p-value calculation,
+        # as we are not interested in exact p-values
+        ks <- suppressWarnings(stats::ks.test(as.vector(allmetrics), initial_dist, exact=FALSE))
         res$ks_stat[k] <- ks$statistic
 
         if (k > length(init)) {

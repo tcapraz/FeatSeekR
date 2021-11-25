@@ -9,13 +9,14 @@ init_selected(init, data)
 \arguments{
 \item{init}{preselected starting set of features}
 
-\item{data}{input data (3 dimensional array with samples x features x replicates)}
+\item{data}{input data
+(3 dimensional array with samples x features x replicates)}
 }
 \value{
 names of initial set of feature
 }
 \description{
-Checks if preselected init features are in input data. If init is NULL,
-it is set to feature with highest replicate correlation.
+Checks if preselected init features are in input data.
+If init is NULL, it is set to feature with highest replicate correlation.
 }
 \keyword{internal}

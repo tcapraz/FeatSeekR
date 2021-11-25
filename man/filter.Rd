@@ -15,6 +15,7 @@ filter(data, init, filter_thr)
 the filtered data array
 }
 \description{
-This function removes features with mean pairwise replicate pearson correlation < filter_thr
+This function removes features with mean pairwise replicate
+pearson correlation < filter_thr
 }
 \keyword{internal}

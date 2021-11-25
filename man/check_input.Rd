@@ -13,9 +13,12 @@ check_input(data)
 input data reshaped to 3 dimensional array with samples x features x replicates
 }
 \description{
-Checks input data. Input data should be a 3 dimensional array with samples x features x replicates or
-list of replicate matrices or dataframes. Each matrix or dataframe corresponds to a replicate and
-should have matching dimensions (samples x features). Column names should correspond to feature names
+Checks input data. Input data should be a 3 dimensional array
+with samples x features x replicates or
+list of replicate matrices or dataframes. Each matrix or dataframe
+corresponds to a replicate and
+should have matching dimensions (samples x features).
+Column names should correspond to feature names
 and must match between replicates.
 }
 \keyword{internal}

@@ -7,13 +7,17 @@ Authors@R: person("Tuemay", "Capraz",
   role = c("cre", "aut"),
   comment = c(ORCID = "0000-0002-2547-067X" ))
 Description: FeatSeekR performs unsupervised feature selection using replicated measurements. It iteratively selects features with the highest consistency across replicates, after projecting out those dimensions from the data that are spanned by the previously selected features. The selected a set of features has a high replicate consistency and a high degree of uniqueness. 
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 Imports:
         abind
 RoxygenNote: 7.1.2
 Suggests: 
     rmarkdown,
-    knitr
+    knitr,
+    BiocStyle,
+    HD2013SGI,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 biocViews: Software, StatisticalMethod, FeatureExtraction
+Config/testthat/edition: 3

@@ -7,17 +7,30 @@
 FeatSeek(data, max_features, init = NULL, filter_thr = NULL)
 }
 \arguments{
-\item{data}{3 dimensional array with samples x features x replicates.}
+\item{data}{3 dimensional array with samples x features x replicates}
 
 \item{max_features}{integer number of features to rank}
 
-\item{init}{vector with names of initial features. If NULL the feature with highest replicate correlation will be used.}
+\item{init}{vector with names of initial features.
+If NULL the feature with highest replicate correlation will be used}
 
-\item{filter_thr}{float between 0 and 1. Features with correlation < filter_thr are removed .}
+\item{filter_thr}{float between 0 and 1.
+Features with correlation < filter_thr are removed}
 }
 \value{
-Dataframe with selected features, rmsd, 1/VIF and variance explained for the selection process
+Dataframe with selected feature names,
+replicate correlation and KS statistic
 }
 \description{
-This function ranks features of a 3 dimensional array according to their consistency between replicates.
+This function ranks features of a 3
+dimensional array according to their consistency between replicates.
+}
+\examples{
+# run FeatSeek to select the top 20 features
+data <-  array(rnorm(50*30*2), dim=c(50,30,2),
+dimnames=list(NULL, paste("feature", seq_len(30)), NULL))
+res <- FeatSeek(data, max_features=20)
+
+# res stores the 20 selected features ranked by their replicate correlations
+
 }

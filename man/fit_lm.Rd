@@ -17,8 +17,10 @@ fit_lm(data, S, k)
 data with previously selected features projected out
 }
 \description{
-Fit linear model for each feature as a function of the previously selected features S.
-The dimensions spanned by the selected features are projected out of the data by setting each feature
+Fit linear model for each feature as a function of
+the previously selected features S.
+The dimensions spanned by the selected features are
+projected out of the data by setting each feature
 to its residuals from the linear model fit.
 }
 \keyword{internal}

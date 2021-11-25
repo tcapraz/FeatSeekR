@@ -1,19 +1,48 @@
 ---
-title: "FeatSeekR-vignette"
-output: rmarkdown::html_vignette
+title: "`FeatSeekR` user guide"
+author: 
+- name: Tuemay Capraz
+  affiliation: European Molecular Biology Laboratory, Heidelberg
+  email: tuemay.capraz@embl.de
+package: FeatSeekR
+date: "`r Sys.Date()`"
+output:  
+    BiocStyle::html_document:
+        toc_float: true
 vignette: >
-  %\VignetteIndexEntry{FeatSeekR-vignette}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{`FeatSeekR` user guide}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignettePackage{FeatSeekR-vignette}
+    %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
+
 
 ```{r setup}
 library(FeatSeekR)
+library(HD2013SGI)
 ```
+
+
+# Introduction
+
+
+
+# Installation
+
+
+```{r, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("FeatSeekR")
+```
+
+# Selecting image features from the HD2013SGI package
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
