@@ -10,7 +10,8 @@ check_input(data)
 \item{data}{input data provided to FeatSeek}
 }
 \value{
-input data reshaped to 3 dimensional array with samples x features x replicates
+input data reshaped to 3 dimensional array with
+samples x features x replicates
 }
 \description{
 Checks input data. Input data should be a 3 dimensional array

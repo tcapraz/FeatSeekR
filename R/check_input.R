@@ -10,7 +10,10 @@
 #'
 #' @param data input data provided to FeatSeek
 #'
-#' @return input data reshaped to 3 dimensional array with samples x features x replicates
+#' @import abind
+#'
+#' @return input data reshaped to 3 dimensional array with
+#' samples x features x replicates
 #'
 #' @keywords internal
 check_input <- function(data){
@@ -19,11 +22,12 @@ check_input <- function(data){
 
         # check if all elements in list are either df or matrix
         ismat <- all(vapply(data, function(x) is.matrix(x), logical(1)))
-        isdf <- all(vapply(data, function(x) inherits(x,"data.frame"), logical(1)))
+        isdf <- all(vapply(data, function(x) inherits(x,"data.frame"),
+                           logical(1)))
         if (!(ismat | isdf)) stop("Not all elements in input list are either dataframes or matrices!")
 
         # get colnames and check if all replicates are matching
-        cnames = lapply(data, function(x) colnames(x))
+        cnames <- lapply(data, function(x) colnames(x))
         if (all(vapply(cnames, function(x) is.null(x), logical(1)))) stop(
             "No feature names given or features not in correct dimension of data array!")
         if (length(unique(cnames))!=1) stop("Feature names are not the same for all replicates!")
@@ -70,10 +74,12 @@ init_selected <- function(init, data){
         stop("Could not find init features in data!")
     }
 
-    # start with feature with highest replicate correlation if no init features were given
+    # start with feature with highest replicate correlation if no init
+    # features were given
     if (is.null(init)){
         cor <- apply(data, 2, function(x) {
-            mean(stats::cor(x, use = "pairwise.complete.obs")[upper.tri(!diag(nrow = dim(data)[3]))])
+            mean(stats::cor(x, use = "pairwise.complete.obs")
+                 [upper.tri(!diag(nrow = dim(data)[3]))])
         })
         init <- names(which.max(cor))
     }
@@ -93,11 +99,13 @@ init_selected <- function(init, data){
 #'
 #' @keywords internal
 filter <- function(data, init, filter_thr){
-    message("Filtering out features with correlation < filter_thr across replicates!")
+    message("Filtering out features with correlation < filter_thr
+            across replicates!")
     # get mean of pairwise correlation between replicates,
     # i.e. the off-diagonal values of the correlation matrix
     cor <- apply(data,2, function(x)
-        mean(stats::cor(x, use="pairwise.complete.obs")[upper.tri(!diag(nrow=dim(data)[3]))]))
+        mean(stats::cor(x, use="pairwise.complete.obs")
+             [upper.tri(!diag(nrow=dim(data)[3]))]))
     keep <-  cor > filter_thr
     features <- dimnames(data)[[2]]
     init_keep <- features %in% init

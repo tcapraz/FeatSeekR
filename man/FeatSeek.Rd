@@ -31,6 +31,6 @@ data <-  array(rnorm(50*30*2), dim=c(50,30,2),
 dimnames=list(NULL, paste("feature", seq_len(30)), NULL))
 res <- FeatSeek(data, max_features=20)
 
-# res stores the 20 selected features ranked by their replicate correlations
+# res stores the 20 selected features ranked by their replicate reproducibility
 
 }

@@ -39,7 +39,6 @@ test_that("check_input returns correct array or appropriate error messages", {
     expect_identical(check_input(df_list2), expected2)
 
     expect_error(check_input(mixed_list), "Not all elements in input list are either dataframes or matrices!")
-    expect_error(check_input(mixed_list), "Not all elements in input list are either dataframes or matrices!")
 
     expect_error(check_input(mat_list_wrong_names), "Feature names are not the same for all replicates!")
     expect_error(check_input(df_list_wrong_names), "Feature names are not the same for all replicates!")
@@ -77,9 +76,9 @@ test_that("init returns feature with highest replicate correlation or issues war
 test_that("filter removes features with replicate correlation < filter_thr and keeps user defined init features" , {
     data <-  array(c(1,2,3), dim=c(3,3,2), dimnames=list(NULL, c("first", "second", "third"), NULL))
     data[,1,1] <- c(3,2,1)
-    filter_thr = 0.5
-    init1="first"
-    init2= "second"
+    filter_thr <- 0.5
+    init1 <- "first"
+    init2 <-  "second"
 
     filtered_data <- data[,2:3,]
 

@@ -10,8 +10,10 @@ Description: FeatSeekR performs unsupervised feature selection using replicated 
 License: GPL-3
 Encoding: UTF-8
 Imports:
-        abind
-RoxygenNote: 7.1.2
+        abind,
+        matrixStats,
+        rstatix
+RoxygenNote: 7.2.1
 Suggests: 
     rmarkdown,
     knitr,

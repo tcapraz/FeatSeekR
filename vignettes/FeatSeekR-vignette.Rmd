@@ -88,78 +88,21 @@ max_features <- 50
 res <- FeatSeek(data, max_features = max_features)
 ```
 
-We can further refine the number of selected features by running get_opt on 
-the result dataframe.
+We can further inspect the selected features by plotting the fraction of explained variance per selected feature.
 
-```{r refine_selection}
-opt <- get_opt(res)
-res_opt <- res[seq_len(opt),]
+```{r inspect_selection}
+plotVarianceExplained(res)
+```
+We select the number of features that explain at least 70% of the total variance
+and plot their correlation matrix.
 
-# subset data to selected features
-Sdata <- data[,res_opt$selected,]
+```{r}
+# get number of features which explain at least 70% of the total variance
+n_feat <- min(which(res$explained_variance > 0.7))
 
-# plot correlation matrix of selected features of one of the replicates
-cor_mat <- cor(Sdata[,,1])
-pheatmap(cor_mat, show_rownames = FALSE, show_colnames = FALSE,
-    treeheight_row = 0, treeheight_col = 0)
+plotSelectedFeatures(data,res, n_features = n_feat)
 ```
 
-We evaluate the selected feature set by calculating the SVD entropy
-and the reconstruction error. SVD entropy is a measure for redundancy, 
-the higher the less redundant are the features of the data. 
-We define the reconstruction error as the square root of the
-frobenius norm when approximating the remaining by the selected features. It is 
-therefore a measure of how well our selected set of features can represent the 
-information present in the whole data. We compare the selected feature set to
-the 50 features with highest variance.
-
-```{r select_highvariance}
-# get top 50 variance features from data averaged over replicates
-data.mean <- apply(data, c(1,2), mean)
-vars <- colVars(data.mean)
-topidx <- sort(vars, index.return=TRUE, decreasing=TRUE)
-var_res <- data.frame(selected=names(topidx$x)[seq_len(max_features)])
-```
-
-```{r, evaluate_features}
-svd_entropy <- svd_entropy(data, res)
-reconstruction_error <- reconstruction_error(data, res)
-
-svd_entropy_var <- svd_entropy(data, var_res)
-reconstruction_error_var <- reconstruction_error(data, var_res)
-
-plot <- function(plotdf, metric, opt) {
-    ggplot(plotdf, aes(x=Features)) + 
-    geom_line(aes( y=FeatSeek, colour="FeatSeek"), size=1.2) +
-    geom_line(aes( y=Variance, colour="Variance"), size=1.2) +
-    geom_point(aes( y=FeatSeek, colour="FeatSeek"), size=2) +
-    geom_point(aes( y=Variance, colour="Variance"), size=2) +
-    geom_vline(xintercept=opt,linetype = "dashed")+
-    scale_shape_manual("", breaks= c("FeatSeek", "Variance"), 
-        values=c(4, 4), guide="none") +
-    ylab(metric)  +
-    xlab("Number of selected features")+
-    scale_colour_manual("",
-        breaks = c("FeatSeek", "Variance"),
-        values = c("red",  "blue"))+
-    theme(axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        panel.background = element_blank(),
-        text = element_text(size=16))
-}
-
-re_df <- data.frame(Features=seq_len(max_features), 
-                    FeatSeek = unlist(reconstruction_error), 
-                    Variance= unlist(reconstruction_error_var))
-svd_df <- data.frame(Features=seq_len(max_features),  
-                     FeatSeek = unlist(svd_entropy), 
-                     Variance=unlist(svd_entropy_var))
-
-plot(re_df, "Reconstruction error", opt)
-plot(svd_df, "SVD entropy", opt)
-```
 
 # Session Info
 

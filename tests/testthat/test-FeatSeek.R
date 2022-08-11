@@ -17,3 +17,4 @@ test_that("FeatSeek returns correct output", {
     # only one feature is selected as all the others are linear combination of init feature
     expect_identical(dim(res3)[1], as.integer(1))
 })
+
