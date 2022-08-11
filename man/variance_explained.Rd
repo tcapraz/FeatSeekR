@@ -15,9 +15,6 @@ variance_explained(data, selected)
 average variance explained by selected features
 }
 \description{
-
-}
-\details{
-
+variance_explained
 }
 \keyword{internal}

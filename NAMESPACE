@@ -3,6 +3,5 @@
 export(FeatSeek)
 export(plotSelectedFeatures)
 export(plotVarianceExplained)
-import(abind)
-import(matrixStats)
-import(rstatix)
+export(simData)
+import(stats)

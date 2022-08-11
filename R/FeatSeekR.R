@@ -1,8 +1,3 @@
-
-
-
-
-
 #' @title FeatSeek
 #' @description This function ranks features of a 3
 #' dimensional array according to their consistency between replicates.
@@ -125,9 +120,6 @@ FeatSeek <- function(data,  max_features, init=NULL, filter_thr = NULL) {
 #' @param data 3 dimensional array with samples x features x replicates
 #' @param r number of replicates
 #'
-#' @import matrixStats
-#' @import rstatix
-#'
 #'
 #' @return pairwise replicate pearson correlations
 #'
@@ -148,6 +140,8 @@ calcCor <- function(data, r){
 #' @param scale logical indicating whether to center and scale the data
 #' @param complete logical indicating whether the data is complete or samples
 #'                are missing
+#'
+#' @import stats
 #'
 #' @return  F-like statistic
 #'

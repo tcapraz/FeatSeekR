@@ -12,16 +12,16 @@ Encoding: UTF-8
 Imports:
         abind,
         matrixStats,
-        rstatix
+        pheatmap,
+        MASS,
+        pracma,
+        stats
 RoxygenNote: 7.2.1
 Suggests: 
     rmarkdown,
     knitr,
     BiocStyle,
     DmelSGI,
-    resample,
-    pheatmap,
-    ggplot2,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 biocViews: Software, StatisticalMethod, FeatureExtraction

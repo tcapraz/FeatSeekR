@@ -10,7 +10,6 @@
 #'
 #' @param data input data provided to FeatSeek
 #'
-#' @import abind
 #'
 #' @return input data reshaped to 3 dimensional array with
 #' samples x features x replicates
@@ -62,6 +61,7 @@ check_input <- function(data){
 #' @param data input data
 #' (3 dimensional array with samples x features x replicates)
 #'
+#'
 #' @return names of initial set of feature
 #'
 #' @keywords internal
@@ -94,6 +94,7 @@ init_selected <- function(init, data){
 #'
 #' @param data 3 dimensional array with samples x features x replicates.
 #' @param filter_thr Mean pairwise replicate pearson correlation threshold
+#'
 #'
 #' @return the filtered data array
 #'

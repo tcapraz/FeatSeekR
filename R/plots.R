@@ -16,10 +16,9 @@
 #'
 #' @export
 plotVarianceExplained <- function(res){
-  p <- plot(seq_len(nrow(res)), res$explained_variance,
-       xlab = "Number of selected features",
-       ylab = "Fraction of explained variance")
-  p
+    plot(seq_len(nrow(res)), res$explained_variance,
+        xlab = "Number of selected features",
+        ylab = "Fraction of explained variance")
 }
 
 
