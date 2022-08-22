@@ -45,19 +45,19 @@ plotVarianceExplained <- function(res){
 #'
 #' @export
 plotSelectedFeatures <- function(data, res, n_features=NULL){
-  if (length(dim(data)) == 3){
-    cnames <- dimnames(data)[[2]]
-    data <- apply(data, c(1,2), mean )
-    colnames(data) <- cnames
-  }
-  if (is.null(n_features)){
-    n_features <- nrow(res)
-  }
-  cor <- stats::cor(data[,res$selected[seq_len(n_features)]], use = "pairwise.complete.obs")
+    if (length(dim(data)) == 3){
+        cnames <- dimnames(data)[[2]]
+        data <- apply(data, c(1,2), mean )
+        colnames(data) <- cnames
+    }
+    if (is.null(n_features)){
+        n_features <- nrow(res)
+    }
+    cor <- stats::cor(data[,res$selected[seq_len(n_features)]], use = "pairwise.complete.obs")
 
-  range <- max(abs(cor))
-  p <- pheatmap::pheatmap(cor, treeheight_row = 0, treeheight_col = 0, legend=TRUE,
-                     show_colnames =FALSE, show_rownames = TRUE,
-                     breaks = seq(-range, range, length.out = 100))
-  p
-}
+    range <- max(abs(cor))
+    p <- pheatmap::pheatmap(cor, treeheight_row = 0, treeheight_col = 0, legend=TRUE,
+                       show_colnames =FALSE, show_rownames = TRUE,
+                       breaks = seq(-range, range, length.out = 100))
+    p
+  }

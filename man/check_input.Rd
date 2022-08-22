@@ -4,10 +4,14 @@
 \alias{check_input}
 \title{check_input}
 \usage{
-check_input(data)
+check_input(data, replicates = NULL)
 }
 \arguments{
 \item{data}{input data provided to FeatSeek}
+
+\item{replicates}{if data is a 2 dimensional array with samples x replcicates
+a dataframe with 2 columns named sample and replicates indicating which
+sample corresponds to which replicate must be provided}
 }
 \value{
 input data reshaped to 3 dimensional array with

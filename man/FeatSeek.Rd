@@ -4,10 +4,22 @@
 \alias{FeatSeek}
 \title{FeatSeek}
 \usage{
-FeatSeek(data, max_features, init = NULL, filter_thr = NULL)
+FeatSeek(
+  data,
+  replicates = NULL,
+  max_features = NULL,
+  init = NULL,
+  filter_thr = NULL
+)
 }
 \arguments{
-\item{data}{3 dimensional array with samples x features x replicates}
+\item{data}{3 dimensional array with samples x features x replicates or
+list of 2 dimensional arrays with samples x features where each element
+corresponds to a replicate or 2 dimensional array with samples x features}
+
+\item{replicates}{if data is a 2 dimensional array with samples x features
+dataframe with 2 columns named sample and replicates indicating which
+sample corresponds to which replicate must be provided.}
 
 \item{max_features}{integer number of features to rank}
 

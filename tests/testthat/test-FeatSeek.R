@@ -6,9 +6,9 @@ test_that("FeatSeek returns correct output", {
     dimnames(data_redundant) <- list(NULL, c("first", "second", "third"), NULL)
     init="first"
     max_features=2
-    res1 <- FeatSeek(data, max_features)
-    res2 <- FeatSeek(data, max_features, init)
-    res3 <- FeatSeek(data_redundant, max_features, init)
+    res1 <- FeatSeek(data, max_features=max_features)
+    res2 <- FeatSeek(data, max_features=max_features, init=init)
+    res3 <- FeatSeek(data_redundant, max_features=max_features, init=init)
 
     expect_identical(dim(res1)[1], as.integer(max_features))
     expect_true(inherits(res1,"data.frame"), "data.frame")

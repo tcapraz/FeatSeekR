@@ -4,7 +4,12 @@
 #'
 #'
 #'
-#' @param data 3 dimensional array with samples x features x replicates
+#' @param data 3 dimensional array with samples x features x replicates or
+#' list of 2 dimensional arrays with samples x features where each element
+#' corresponds to a replicate or 2 dimensional array with samples x features
+#' @param replicates if data is a 2 dimensional array with samples x features
+#' dataframe with 2 columns named sample and replicates indicating which
+#' sample corresponds to which replicate must be provided.
 #' @param init vector with names of initial features.
 #' If NULL the feature with highest replicate correlation will be used
 #' @param max_features integer number of features to rank
@@ -22,9 +27,9 @@
 #' # res stores the 20 selected features ranked by their replicate reproducibility
 #'
 #' @export
-FeatSeek <- function(data,  max_features, init=NULL, filter_thr = NULL) {
+FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filter_thr = NULL) {
 
-    data <- check_input(data)
+    data <- check_input(data, replicates)
     n <- dim(data)[1]
     p <- dim(data)[2]
     r <- dim(data)[3]
@@ -44,6 +49,11 @@ FeatSeek <- function(data,  max_features, init=NULL, filter_thr = NULL) {
     n <- dim(data)[1]
     p <- dim(data)[2]
     r <- dim(data)[3]
+
+    # init max_features
+    if(is.null(max_features)){
+        max_features <- p
+    }
     # initialize output dataframe
     res <-
         data.frame(

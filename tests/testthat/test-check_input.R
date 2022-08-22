@@ -31,6 +31,39 @@ test_that("check_input returns correct array or appropriate error messages", {
     arr_wrong_dims <- array(1, dim=c(2,2))
 
 
+    data <- array(rnorm(2000), dim= c(100,20))
+    colnames(data) <- paste("feature", seq_len(ncol(data)))
+    replicates <- data.frame(sample=rep(seq_len(50),each=2), replicate=rep(c(1,2),50))
+    data_expected1 <- array(data[seq(1,100,by=2),], dim = c(50,20,1))
+    data_expected2 <- array(data[seq(2,100,by=2),], dim = c(50,20,1))
+    data_expected <- abind::abind(data_expected1 ,data_expected2)
+    expect_identical(check_input(data, replicates), data_expected)
+
+    replicates <- data.frame(sample=rep(seq_len(50),2), replicate=rep(c(1,2),each=50))
+    data_expected1 <- array(data[seq_len(50),], dim = c(50,20,1))
+    data_expected2 <- array(data[seq(51,100),], dim = c(50,20,1))
+    data_expected <- abind::abind(data_expected1 ,data_expected2)
+    expect_identical(check_input(data, replicates), data_expected)
+
+
+    data <- array(rnorm(150*20), dim= c(150,20))
+    replicates <- data.frame(sample=rep(seq_len(50),3), replicate=rep(c(1,2,3),each=50))
+    data_expected1 <- array(data[seq_len(50),], dim = c(50,20,1))
+    data_expected2 <- array(data[seq(51,100),], dim = c(50,20,1))
+    data_expected3 <- array(data[seq(101,150),], dim = c(50,20,1))
+    data_expected <- abind::abind(data_expected1 ,data_expected2, data_expected3 )
+    expect_identical(check_input(data, replicates), data_expected)
+
+    replicates <- replicates[seq_len(148),]
+    data <- data[seq_len(148),]
+    data_expected1 <- array(data[seq_len(50),], dim = c(50,20,1))
+    data_expected2 <- array(data[seq(51,100),], dim = c(50,20,1))
+    data_expected3 <- array(dim = c(50,20,1))
+    data_expected3[seq(1,48),,]  <- data[seq(101,148),]
+    data_expected <- abind::abind(data_expected1 ,data_expected2, data_expected3 )
+    same <- (check_input(data, replicates)  == data_expected) | (is.na(check_input(data, replicates)) & is.na(data_expected))
+    expect_true(all(same))
+
     expect_identical(check_input(arr), arr)
     expect_identical(check_input(mat_list1), expected1)
     expect_identical(check_input(mat_list2), expected2)
@@ -43,12 +76,12 @@ test_that("check_input returns correct array or appropriate error messages", {
     expect_error(check_input(mat_list_wrong_names), "Feature names are not the same for all replicates!")
     expect_error(check_input(df_list_wrong_names), "Feature names are not the same for all replicates!")
 
-    expect_error(check_input(arr_wrong_dims), "At least 2 replicates required!")
+    expect_error(check_input(arr_wrong_dims), "Replicates not found. Please provide a dataframe indicating which sample corresponds to which replicate!")
     expect_error(check_input(arr_wrong_names), "No feature names given or features not in correct dimension of data array!")
 
     expect_error(check_input(empty_list), "Please provide a list of matrices/dataframes or a 3 dimensional array as input!")
     expect_error(check_input(empty_df), "Please provide a list of matrices/dataframes or a 3 dimensional array as input!")
-    expect_error(check_input(empty_mat), "At least 2 replicates required!")
+    expect_error(check_input(empty_mat), "Replicates not found. Please provide a dataframe indicating which sample corresponds to which replicate!")
 
 
     expect_error(check_input("test"), "Please provide a list of matrices/dataframes or a 3 dimensional array as input!")
