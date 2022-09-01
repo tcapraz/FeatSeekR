@@ -96,7 +96,7 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
         names(metric) <- dimnames(data)[[2]]
         if (k > length(init)) {
             # select feature whose residuals have the highest correlation
-            I <- names(metric)[which.max(metric)]
+            I <- names(metric)[which.min(metric)]
         } else{
             # first features are set to init ones
             I <- init[k]
