@@ -56,8 +56,8 @@ plotSelectedFeatures <- function(data, res, n_features=NULL){
     cor <- stats::cor(data[,res$selected[seq_len(n_features)]], use = "pairwise.complete.obs")
 
     range <- max(abs(cor))
-    p <- pheatmap::pheatmap(cor, treeheight_row = 0, treeheight_col = 0, legend=TRUE,
+    pheatmap::pheatmap(cor, treeheight_row = 0, treeheight_col = 0, legend=TRUE,
                        show_colnames =FALSE, show_rownames = TRUE,
                        breaks = seq(-range, range, length.out = 100))
-    p
+
   }

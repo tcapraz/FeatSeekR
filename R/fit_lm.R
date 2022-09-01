@@ -16,20 +16,18 @@
 fit_lm <- function(data, S, k){
     # get current features in data
     features <- dimnames(data)[[2]]
-    r <- dim(data)[[3]]
     d <- list()
-    # fit linear model for each replicate and overwrite data with residuals
-
-    for (j in seq_len(r)){
-        sel <- S[,seq_len(k-1),j]
-        model <- stats::lm(data[, , j] ~ sel + 0, na.action = stats::na.exclude)
-        if (dim(data)[2] ==1) {
-            eps <- array(NA, length(data[, , j]))
-        } else {
-            eps <- array(NA, dim(data[, , j]))
-        }
-        eps[!is.na(data[, , j])] <- model$residuals
-        data[, , j] <- ifelse(abs(eps)<10^(-10), 0, eps)
-    }
+    # fit linear model and overwrite data with residuals
+    sel <- S[,seq_len(k-1)]
+    model <- stats::lm(data ~ sel + 0, na.action = stats::na.exclude)
+    # if (dim(data)[2] ==1) {
+    #     eps <- array(NA, length(data))
+    # } else {
+    #     eps <- array(NA, dim(data))
+    # }
+    eps <- array(NA, dim(data))
+    eps[!is.na(data)] <- model$residuals
+    data <- ifelse(abs(eps)<10^(-10), 0, eps)
+    dimnames(data)[[2]] <- features
     data
 }

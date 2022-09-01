@@ -47,25 +47,16 @@ check_input <- function(data, replicates=NULL){
     } else if (is.array(data)) {
         if ( length(dim(data)) ==2){
             if (is.null(replicates)) stop("Replicates not found. Please provide a dataframe indicating which sample corresponds to which replicate!")
-            if (!nrow(replicates) == dim(data)[1]) stop("Replicate indicator dataframe not same length as samples in data!")
-            if (!inherits(replicates, "data.frame")) stop("Please provide a dataframe indicating which sample belongs to which replicate")
-            if ( ncol(replicates) != 2) stop("Please provide a dataframe indicating which sample belongs to which replicate, with columns named sample and replicate!")
-            if ("sample" %in% replicates & "replicate" %in% replicates) stop("Please provide a dataframe indicating which sample belongs to which replicate, with columns named sample and replicate!")
-            if (any(table(replicates$sample) < 2)) stop("Not every sample has at least 2 replicates!")
-            if ( min(table(replicates$replicate)) < ncol(data)) stop("Too many missing samples for one of the replicates!")
-            if( !all(replicates$sample == floor(replicates$sample)) & !all(replicates$replicate == floor(replicates$replicate))) stop("Please provide integer ids for samples and replicates!")
-            nsamples <- length(unique(replicates$sample))
-            nrep <-  length(unique(replicates$replicate))
-            nfeat <- ncol(data)
-            outdata <- array(dim=c(nsamples,nfeat, nrep))
-            samplenames <- dimnames(data)[[1]]
-            featnames <- dimnames(data)[[1]]
-
-            for (i in unique(replicates$replicate)){
-                outdata[ replicates$sample[replicates$replicate == i],,i] <- data[replicates$replicate == i,]
-            }
-            data <- outdata
-            dimnames(data)<- list(samplenames, featnames,NULL)
+            if (!length(replicates) == dim(data)[1]) stop("Replicate indicator dataframe not same length as samples in data!")
+            #if (!inherits(replicates, "numeric")) stop("Please provide a dataframe indicating which sample belongs to which replicate")
+            if (any(table(replicates) < 2)) stop("Not every sample has at least 2 replicates!")
+            #if (min(table(replicates)) < ncol(data)) stop("Too low number of samples for one of the replicates!")
+            # nsamples <- length(replicates)
+            # nrep <-  length(unique(replicates))
+            # nfeat <- ncol(data)
+            # outdata <- array(dim=c(nsamples,nfeat, nrep))
+            # samplenames <- dimnames(data)[[1]]
+            # featnames <- dimnames(data)[[1]]
         }else{
             # check if there are at least 2 replicates
             if( length(dim(data)) !=3) stop("At least 2 replicates required!")
@@ -92,7 +83,7 @@ check_input <- function(data, replicates=NULL){
 #' @return names of initial set of feature
 #'
 #' @keywords internal
-init_selected <- function(init, data){
+init_selected <- function(init, data, replicates){
 
     features <- dimnames(data)[[2]]
     if (is.null(features)) stop("No feature names given or features not in correct dimension of data array!")
@@ -104,11 +95,14 @@ init_selected <- function(init, data){
     # start with feature with highest replicate correlation if no init
     # features were given
     if (is.null(init)){
-        cor <- apply(data, 2, function(x) {
-            mean(stats::cor(x, use = "pairwise.complete.obs")
-                 [upper.tri(!diag(nrow = dim(data)[3]))])
+        data <- data.frame(data)
+        f <- sapply(seq_len(dim(data)[[2]]), function(x){
+          m <- lm(replicates~data[,x])
+          s <- summary(m)
+          s$fstatistic[1]
         })
-        init <- names(which.max(cor))
+        names(f) <-  features
+        init <- names(which.min(f))
     }
     init
 }

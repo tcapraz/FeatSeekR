@@ -9,7 +9,7 @@ check_input(data, replicates = NULL)
 \arguments{
 \item{data}{input data provided to FeatSeek}
 
-\item{replicates}{if data is a 2 dimensional array with samples x replcicates
+\item{replicates}{if data is a 2 dimensional array with samples x features
 a dataframe with 2 columns named sample and replicates indicating which
 sample corresponds to which replicate must be provided}
 }

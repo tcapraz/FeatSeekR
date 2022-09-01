@@ -32,10 +32,10 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
     data <- check_input(data, replicates)
     n <- dim(data)[1]
     p <- dim(data)[2]
-    r <- dim(data)[3]
+    r <- length(unique(replicates))
 
     # initialize starting set of features
-    init <- init_selected(init, data)
+    init <- init_selected(init, data, replicates)
 
     message("Input data has: \n",
             n, " samples \n",
@@ -48,7 +48,7 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
     }
     n <- dim(data)[1]
     p <- dim(data)[2]
-    r <- dim(data)[3]
+    r <- length(unique(replicates))
 
     # init max_features
     if(is.null(max_features)){
@@ -66,7 +66,7 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
     metric_all <- list()
 
     # initialize matrix of selected features
-    S <- array(NA, dim=c(n,p,r))
+    S <- array(NA, dim=c(n,p))
     k <- 1
 
     data0 <- data
@@ -80,7 +80,7 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
             data <- fit_lm(data, S, k)
         }
         # check if any replicate contains only zero residuals
-        if (any(apply(data, 3, function(x) {all(x==0)}))) {
+        if (any(apply(data, 2, function(x) {all(x==0)}))) {
             # if all residuals are close to zero stop selection procedure
             message(
                 "Stopping selection procedure with k=",
@@ -91,7 +91,7 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
             break
         }
         # calculate mean pairwise correlations between all replicates
-        metric <- calcFstat(data)
+        metric <- calc_f(data, replicates)
         metric_all[[k]] <- metric
         names(metric) <- dimnames(data)[[2]]
         if (k > length(init)) {
@@ -105,9 +105,9 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
         res$metric[k] <- metric[I]
         # store selected feature
         res$selected[k] <- I
-        S[, k,] <- data[, I, , drop = FALSE]
+        S[, k] <- data[, I,  drop = FALSE]
         # drop selected feature from data
-        data <- data[, dimnames(data)[[2]]!= I,  , drop = FALSE]
+        data <- data[, dimnames(data)[[2]]!= I,   drop = FALSE]
         message("Iteration: ",k," selected = ",res$selected[k],
                 ", replicate F-statistic = ",res$metric[k])
         k <- k + 1
@@ -168,8 +168,8 @@ calcFstat <- function(data, scale=TRUE, complete=TRUE){
     Fvalue <- vapply(seq_len(dim(data)[2]), function(x, data, complete){
         if (complete) {
             v <- data[,x,]
-            varwithin  <- mean(matrixStats::rowVars(t(v)))
-            varbetween <- var(rowMeans(v))
+            varwithin  <- mean(matrixStats::rowVars(t(v), na.rm = TRUE))
+            varbetween <- var(rowMeans(v, na.rm = TRUE))
             sqrt(varbetween / varwithin)
         } else {
             v <- data[,x,]
@@ -189,3 +189,17 @@ calcFstat <- function(data, scale=TRUE, complete=TRUE){
     Fvalue
 }
 
+
+calc_f <- function(data,reps, scale=TRUE){
+
+  data <- scale(data)
+  f <- vapply(seq_len(dim(data)[2]), function(x){
+    m <- lm(reps~data[,x])
+    s <- summary(m)
+    f <- s$fstatistic[1]
+    }, numeric(1))
+
+
+  f
+
+}

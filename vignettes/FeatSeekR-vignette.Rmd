@@ -31,7 +31,7 @@ A fundamental step in many analyses of high-dimensional data is dimension
 reduction. Feature selection is one approach to dimension reduction whose 
 strengths include interpretability, conceptual simplicity, transferability 
 and modularity.
-Here, we introduce the FeatSeekR algorithm, which selects features based on 
+Here, we introduce the `FeatSeekR` algorithm, which selects features based on 
 the consistency of their signal across replicates and their non-redundancy.
 It takes a 3 dimensional array (samples x features x replicates) 
 or a list of replicate matrices/dataframes (samples x features)  as input 
@@ -83,7 +83,7 @@ pheatmap::pheatmap(cor, treeheight_row = 0 , treeheight_col = 0,
 ```
 As expected, the features cluster together according to their underlying latent
 factor.
-We now run FeatSeekR to rank the features based on their uniqueness and
+We now run `FeatSeekR` to rank the features based on their uniqueness and
 reproducibility.
 
 ```{r plot top 5}
@@ -99,7 +99,7 @@ correlated.
 
 # Selecting image features from the `DmelSGI` package
 
-Here we use FeatSeekR to rapidly identify unique features with reproducible 
+Here we use `FeatSeekR` to rapidly identify unique features with reproducible 
 signal between measurements in an image dataset from the `DmelSGI` package. 
 The authors of `DmelSGI` performed combinatorial gene knock-outs using siRNA, 
 followed by imaging of the cells. The resulting images were segmented and 

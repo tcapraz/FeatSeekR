@@ -4,7 +4,7 @@
 \alias{init_selected}
 \title{init_selected}
 \usage{
-init_selected(init, data)
+init_selected(init, data, replicates)
 }
 \arguments{
 \item{init}{preselected starting set of features}
