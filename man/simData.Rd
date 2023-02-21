@@ -7,7 +7,7 @@ simulate Data with orthogonal feature clusters
 each feature cluster contains 10 features and corresponds to a different
 orthogonal latent factor}
 \usage{
-simData(samples, latent_factors, replicates, error = 0)
+simData(samples, latent_factors, replicates)
 }
 \arguments{
 \item{samples}{number of samples to generate}
@@ -15,8 +15,6 @@ simData(samples, latent_factors, replicates, error = 0)
 \item{latent_factors}{number of latent factors to generate}
 
 \item{replicates}{number of replicates to generate}
-
-\item{error}{variance of the sampled noise}
 }
 \value{
 array containing the simulated data with dimensions

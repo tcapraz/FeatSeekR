@@ -4,44 +4,34 @@
 \alias{FeatSeek}
 \title{FeatSeek}
 \usage{
-FeatSeek(
-  data,
-  replicates = NULL,
-  max_features = NULL,
-  init = NULL,
-  filter_thr = NULL
-)
+FeatSeek(data, replicates, max_features = NULL, init = NULL)
 }
 \arguments{
-\item{data}{3 dimensional array with samples x features x replicates or
-list of 2 dimensional arrays with samples x features where each element
-corresponds to a replicate or 2 dimensional array with samples x features}
+\item{data}{2 dimensional array with samples x features, where each sample
+belongs to a different replicate}
 
-\item{replicates}{if data is a 2 dimensional array with samples x features
-dataframe with 2 columns named sample and replicates indicating which
-sample corresponds to which replicate must be provided.}
+\item{replicates}{numeric vector of length samples,
+indicating which sample belongs to which replicate}
 
 \item{max_features}{integer number of features to rank}
 
 \item{init}{vector with names of initial features.
-If NULL the feature with highest replicate correlation will be used}
-
-\item{filter_thr}{float between 0 and 1.
-Features with correlation < filter_thr are removed}
+If NULL the feature with highest F-statistic will be used}
 }
 \value{
 Dataframe with selected feature names,
-replicate correlation and KS statistic
+F-statistic and explained variance
 }
 \description{
-This function ranks features of a 3
-dimensional array according to their consistency between replicates.
+This function ranks features of a 2
+dimensional array according to their reproducibility between replicates.
 }
 \examples{
 # run FeatSeek to select the top 20 features
-data <-  array(rnorm(50*30*2), dim=c(50,30,2),
-dimnames=list(NULL, paste("feature", seq_len(30)), NULL))
-res <- FeatSeek(data, max_features=20)
+data <-  array(rnorm(100*30), dim=c(100,30),
+dimnames <- list(NULL, paste("feature", seq_len(30))))
+reps <- rep(c(1,2), each=50)
+res <- FeatSeek(data, reps, max_features=20)
 
 # res stores the 20 selected features ranked by their replicate reproducibility
 

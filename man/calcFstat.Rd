@@ -4,20 +4,20 @@
 \alias{calcFstat}
 \title{calcFstat}
 \usage{
-calcFstat(data, scale = TRUE, complete = TRUE)
+calcFstat(data, reps, scale = TRUE)
 }
 \arguments{
-\item{data}{3 dimensional array with samples x features x replicates}
+\item{data}{2 dimensional array with samples x features, where each sample
+belongs to a different replicate}
 
-\item{scale}{logical indicating whether to center and scale the data}
+\item{reps}{numeric vector of length samples,
+indicating which sample belongs to which replicate}
 
-\item{complete}{logical indicating whether the data is complete or samples
-are missing}
+\item{scale}{whether to scale the data, default = TRUE}
 }
 \value{
-F-like statistic
+F-statistic for all features
 }
 \description{
-Calculate F statistic between replicates
+calcFstat
 }
-\keyword{internal}

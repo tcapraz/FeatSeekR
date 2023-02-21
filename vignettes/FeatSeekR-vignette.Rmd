@@ -33,10 +33,9 @@ strengths include interpretability, conceptual simplicity, transferability
 and modularity.
 Here, we introduce the `FeatSeekR` algorithm, which selects features based on 
 the consistency of their signal across replicates and their non-redundancy.
-It takes a 3 dimensional array (samples x features x replicates) 
-or a list of replicate matrices/dataframes (samples x features)  as input 
-and returns a dataframe storing the selected and ranked features and 
-their replicate correlations.
+It takes a 2 dimensional array (samples x features) of replicated measurements
+and returns a dataframe storing the selected and features ranked by 
+reproducibility.
 
 # Installation
 
@@ -54,18 +53,19 @@ Features derived from the same latent factor are highly redundant and form
 distinct clusters.
 
 ```{r simulate data}
-set.seed(42)
+set.seed(111)
 # simulate data with 500 samples, 3 replicates and 5 latent factors 
 # generating 50 features
 samples <- 500
 latent_factors <- 5
 replicates <- 3
 
-data <- FeatSeekR::simData(samples=samples,latent_factors =latent_factors,
+sim <- FeatSeekR::simData(samples=samples,latent_factors =latent_factors,
                 replicates = replicates)
-data.mean = apply(data, c(1,2), mean)
-# calculate the feature correlation 
-cor <- stats::cor(data.mean, use = "pairwise.complete.obs")
+data <- sim[[1]]
+reps <- sim[[2]]
+# calculate the feature correlation for first replicate
+cor <- stats::cor(data[reps==1,], use = "pairwise.complete.obs")
 
 range <- max(abs(cor))
 # plot a heatmap of the features and color features according to their 
@@ -88,7 +88,7 @@ reproducibility.
 
 ```{r plot top 5}
 # select the top 5 features
-res <- FeatSeek(data, max_features=5)
+res <- FeatSeek(data, replicates =reps, max_features=5)
 
 # plot a heatmap of the top 5 selected features 
 FeatSeekR::plotSelectedFeatures(data, res)
@@ -105,23 +105,26 @@ The authors of `DmelSGI` performed combinatorial gene knock-outs using siRNA,
 followed by imaging of the cells. The resulting images were segmented and 
 features were extracted using the `EBImage` package. 
 
+
 ```{r, load_data}
 # load data
 data("subSampleForStabilitySelection", package="DmelSGI")
 data <- subSampleForStabilitySelection$D
-# make sure dimensions are samples x features x replicates
 data <- aperm(data, c(1,3,2))
 # set feature names
 dimnames(data)[[2]] <- subSampleForStabilitySelection$phenotype
+# bind samples and create replicate indicator vector
+reps <- rep(c(1,2), each=dim(data)[1])
+data<- rbind(data[,,1], data[,,2])
 dim(data)
 ```
 
-The input data is a 3 dimensional array with 3000 samples, 162 features and 2
+The input data has 3000 samples, 162 features and 2
 replicates.
 
 ```{r plot data}
 # plot correlation matrix of the first 100 features of one of the replicates
-cor_mat <- cor(data[,1:100,1])
+cor_mat <- cor(data[reps==1,1:50])
 pheatmap::pheatmap(cor_mat, show_rownames = FALSE, show_colnames = FALSE,
     treeheight_row = 0, treeheight_col = 0)
 ```
@@ -132,8 +135,8 @@ FeatSeek to identify unique features with high replicate consistency.
 
 ```{r select_features}
 # select up to 50 features
-max_features <- 50
-res <- FeatSeekR::FeatSeek(data, max_features = max_features)
+max_features <- 20
+res <- FeatSeekR::FeatSeek(data, replicates = reps, max_features = max_features)
 ```
 
 We can further inspect the selected features by plotting the fraction of explained variance per selected feature.

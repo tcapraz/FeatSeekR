@@ -4,7 +4,7 @@
 \alias{check_input}
 \title{check_input}
 \usage{
-check_input(data, replicates = NULL)
+check_input(data, replicates, max_features)
 }
 \arguments{
 \item{data}{input data provided to FeatSeek}
