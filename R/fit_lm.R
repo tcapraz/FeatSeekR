@@ -20,14 +20,9 @@ fit_lm <- function(data, S, k){
     # fit linear model and overwrite data with residuals
     sel <- S[,seq_len(k-1)]
     model <- stats::lm(data ~ sel + 0, na.action = stats::na.exclude)
-    # if (dim(data)[2] ==1) {
-    #     eps <- array(NA, length(data))
-    # } else {
-    #     eps <- array(NA, dim(data))
-    # }
     eps <- array(NA, dim(data))
     eps[!is.na(data)] <- model$residuals
-    data <- ifelse(abs(eps)<10^(-10), 0, eps)
+    data <- ifelse(abs(eps)<10^(-20), 0, eps)
     dimnames(data)[[2]] <- features
     data
 }

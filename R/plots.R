@@ -7,9 +7,10 @@
 #'
 #' @examples
 #' # run FeatSeek to select the top 20 features
-#' data <-  array(rnorm(50*30*2), dim=c(50,30,2),
-#' dimnames=list(NULL, paste("feature", seq_len(30)), NULL))
-#' res <- FeatSeek(data, max_features=20)
+#' data <-  array(rnorm(100*30), dim=c(100,30),
+#' dimnames <- list(NULL, paste("feature", seq_len(30))))
+#' reps <- rep(c(1,2), each=50)
+#' res <- FeatSeek(data, reps, max_features=20)
 #'
 #' # res stores the 20 selected features ranked by their replicate reproducibility
 #' plotVarianceExplained(res)
@@ -36,9 +37,11 @@ plotVarianceExplained <- function(res){
 #'
 #' @examples
 #' # run FeatSeek to select the top 20 features
-#' data <-  array(rnorm(50*30*2), dim=c(50,30,2),
-#' dimnames=list(NULL, paste("feature", seq_len(30)), NULL))
-#' res <- FeatSeek(data, max_features=20)
+#' data <-  array(rnorm(100*30), dim=c(100,30),
+#' dimnames <- list(NULL, paste("feature", seq_len(30))))
+#' reps <- rep(c(1,2), each=50)
+#' res <- FeatSeek(data, reps, max_features=20)
+#'
 #' # res stores the 20 selected features ranked by their replicate reproducibility
 #' # plot the top 5 features
 #' plotSelectedFeatures(data, res, n_features=5)

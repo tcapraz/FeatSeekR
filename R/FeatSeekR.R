@@ -1,35 +1,33 @@
 #' @title FeatSeek
-#' @description This function ranks features of a 3
-#' dimensional array according to their consistency between replicates.
+#' @description This function ranks features of a 2
+#' dimensional array according to their reproducibility between replicates.
 #'
 #'
 #'
-#' @param data 3 dimensional array with samples x features x replicates or
-#' list of 2 dimensional arrays with samples x features where each element
-#' corresponds to a replicate or 2 dimensional array with samples x features
-#' @param replicates if data is a 2 dimensional array with samples x features
-#' dataframe with 2 columns named sample and replicates indicating which
-#' sample corresponds to which replicate must be provided.
+#' @param data 2 dimensional array with samples x features, where each sample
+#' belongs to a different replicate
+#'
+#' @param replicates numeric vector of length samples,
+#' indicating which sample belongs to which replicate
 #' @param init vector with names of initial features.
-#' If NULL the feature with highest replicate correlation will be used
+#' If NULL the feature with highest F-statistic will be used
 #' @param max_features integer number of features to rank
-#' @param filter_thr float between 0 and 1.
-#' Features with correlation < filter_thr are removed
 #' @return Dataframe with selected feature names,
-#' replicate correlation and KS statistic
+#' F-statistic and explained variance
 #'
 #' @examples
 #' # run FeatSeek to select the top 20 features
-#' data <-  array(rnorm(50*30*2), dim=c(50,30,2),
-#' dimnames=list(NULL, paste("feature", seq_len(30)), NULL))
-#' res <- FeatSeek(data, max_features=20)
+#' data <-  array(rnorm(100*30), dim=c(100,30),
+#' dimnames <- list(NULL, paste("feature", seq_len(30))))
+#' reps <- rep(c(1,2), each=50)
+#' res <- FeatSeek(data, reps, max_features=20)
 #'
 #' # res stores the 20 selected features ranked by their replicate reproducibility
 #'
 #' @export
-FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filter_thr = NULL) {
+FeatSeek <- function(data, replicates, max_features=NULL, init=NULL) {
 
-    data <- check_input(data, replicates)
+    check_input(data, replicates, max_features)
     n <- dim(data)[1]
     p <- dim(data)[2]
     r <- length(unique(replicates))
@@ -42,10 +40,6 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
             r, " replicates \n",
             p, " features")
 
-    # remove features with correlation < filter_thr
-    if(!is.null(filter_thr)){
-        data <- filter(data, init, filter_thr)
-    }
     n <- dim(data)[1]
     p <- dim(data)[2]
     r <- length(unique(replicates))
@@ -91,7 +85,7 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
             break
         }
         # calculate mean pairwise correlations between all replicates
-        metric <- calc_f(data, replicates)
+        metric <- calcFstat(data, replicates)
         metric_all[[k]] <- metric
         names(metric) <- dimnames(data)[[2]]
         if (k > length(init)) {
@@ -123,83 +117,27 @@ FeatSeek <- function(data, replicates = NULL, max_features=NULL, init=NULL, filt
     res
 }
 
-#' @title calcCor
-#'
-#' @description Calculate pairwise replicate correlations
-#'
-#' @param data 3 dimensional array with samples x features x replicates
-#' @param r number of replicates
-#'
-#'
-#' @return pairwise replicate pearson correlations
-#'
-#'
-#' @keywords internal
-calcCor <- function(data, r){
-    feat_cor <- stats::cor(data, use="pairwise.complete.obs")
-    feat_cor[is.na(feat_cor)] <- 0
-    feat_cor[upper.tri(!diag(nrow=r))]
-}
 
 
-#' calcFstat
+#' @title calcFstat
 #'
-#' @description Calculate F statistic between replicates
+#' @param data 2 dimensional array with samples x features, where each sample
+#' belongs to a different replicate
+#' @param reps numeric vector of length samples,
+#' indicating which sample belongs to which replicate
+#' @param scale whether to scale the data, default = TRUE
 #'
-#' @param data 3 dimensional array with samples x features x replicates
-#' @param scale logical indicating whether to center and scale the data
-#' @param complete logical indicating whether the data is complete or samples
-#'                are missing
+#' @return F-statistic for all features
 #'
-#' @import stats
+#' @internal
 #'
-#' @return  F-like statistic
-#'
-#'@keywords internal
-calcFstat <- function(data, scale=TRUE, complete=TRUE){
-    # scale each replicate
-    if (scale){
-        data <- lapply(seq_len(dim(data)[3]),  function(x, data){
-            scale(data[,,x],center=TRUE, scale=TRUE)
-            }, data=data)
-        data <- abind::abind(data, along=3)
+calcFstat <- function(data,reps, scale=TRUE){
 
-    }
-    Fvalue <- vapply(seq_len(dim(data)[2]), function(x, data, complete){
-        if (complete) {
-            v <- data[,x,]
-            varwithin  <- mean(matrixStats::rowVars(t(v), na.rm = TRUE))
-            varbetween <- var(rowMeans(v, na.rm = TRUE))
-            sqrt(varbetween / varwithin)
-        } else {
-            v <- data[,x,]
-            grpsb <- c(vapply(seq_len(dim(v)[2]), function(x, v){
-                seq_along(v[,x])
-            }, integer(nrow(v)), v=v))
-            grpsw <- c(vapply(seq_len(dim(v)[1]), function(x, v){
-                seq_along(v[x,])
-            }, integer(ncol(v)), v=v))
-            vt <- t(v)
-            varwithin  <- tapply(vt, grpsw, FUN = stats::var,  na.rm = TRUE) |> mean()
-            varbetween <- tapply(v, grpsb, FUN = mean, na.rm = TRUE) |> stats::var()
-            sqrt(varbetween / varwithin)
-        }
-
-    },FUN.VALUE = numeric(1),  data=data, complete=complete)
-    Fvalue
-}
-
-
-calc_f <- function(data,reps, scale=TRUE){
-
-  data <- scale(data)
-  f <- vapply(seq_len(dim(data)[2]), function(x){
-    m <- lm(reps~data[,x])
-    s <- summary(m)
-    f <- s$fstatistic[1]
-    }, numeric(1))
-
-
-  f
-
+    data <- scale(data)
+    f <- vapply(seq_len(dim(data)[2]), function(x){
+        m <- stats::lm(reps~data[,x])
+        s <- summary(m)
+        f <- s$fstatistic[1]
+        }, numeric(1))
+    f
 }

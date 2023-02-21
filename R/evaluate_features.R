@@ -16,7 +16,7 @@ variance_explained <- function(data,selected){
     # model holds a fit for each remaining feature
     s <- suppressWarnings(summary(model))
     r <- mean(vapply(s, function(x){
-      x$r.squared
+        x$r.squared
     }, numeric(1)))
 
     r

@@ -18,56 +18,17 @@
 #' samples x features x replicates
 #'
 #' @keywords internal
-check_input <- function(data, replicates=NULL){
-    # check if list was provided as input
-    if (inherits(data,"list") & length(data) > 0){
+check_input <- function(data, replicates, max_features){
 
-        # check if all elements in list are either df or matrix
-        ismat <- all(vapply(data, function(x) is.matrix(x), logical(1)))
-        isdf <- all(vapply(data, function(x) inherits(x,"data.frame"),
-                           logical(1)))
-        if (!(ismat | isdf)) stop("Not all elements in input list are either dataframes or matrices!")
+    cnames <- colnames(data)
+    if (all(vapply(cnames, function(x) is.null(x), logical(1)))) stop(
+        "No feature names given or features not in correct dimension of data array!")
 
-        # get colnames and check if all replicates are matching
-        cnames <- lapply(data, function(x) colnames(x))
-        if (all(vapply(cnames, function(x) is.null(x), logical(1)))) stop(
-            "No feature names given or features not in correct dimension of data array!")
-        if (length(unique(cnames))!=1) stop("Feature names are not the same for all replicates!")
+    if (!is.null(max_features) & max_features > dim(data)[2]) stop("Max features higher than features in data!")
 
-        # convert data to matrix and concat to 3 dim array
-        data <- lapply(data, function(x) array(as.matrix(x), dim=dim(x)))
-        data <- Reduce(function(x,y) abind::abind(x,y,along=3), data)
-
-        # set feature names of array
-        dimnames(data)[[2]] <- cnames[[1]]
-
-        if( length(dim(data)) !=3) stop("At least 2 replicates required!")
-
-        # check if input is 3 dim array
-    } else if (is.array(data)) {
-        if ( length(dim(data)) ==2){
-            if (is.null(replicates)) stop("Replicates not found. Please provide a dataframe indicating which sample corresponds to which replicate!")
-            if (!length(replicates) == dim(data)[1]) stop("Replicate indicator dataframe not same length as samples in data!")
-            #if (!inherits(replicates, "numeric")) stop("Please provide a dataframe indicating which sample belongs to which replicate")
-            if (any(table(replicates) < 2)) stop("Not every sample has at least 2 replicates!")
-            #if (min(table(replicates)) < ncol(data)) stop("Too low number of samples for one of the replicates!")
-            # nsamples <- length(replicates)
-            # nrep <-  length(unique(replicates))
-            # nfeat <- ncol(data)
-            # outdata <- array(dim=c(nsamples,nfeat, nrep))
-            # samplenames <- dimnames(data)[[1]]
-            # featnames <- dimnames(data)[[1]]
-        }else{
-            # check if there are at least 2 replicates
-            if( length(dim(data)) !=3) stop("At least 2 replicates required!")
-            if( dim(data)[3] < 2) stop("At least 2 replicates required!")
-            if (is.null(dimnames(data)[[2]]))  stop("No feature names given or features not in correct dimension of data array!")
-        }
-
-    } else{
-        stop("Please provide a list of matrices/dataframes or a 3 dimensional array as input!")
-    }
-    data
+    if( length(unique(replicates)) < 2) stop("At least 2 replicates required!")
+    if (!length(replicates) == dim(data)[1]) stop("Replicate indicator vector not same length as samples in data!")
+    if (any(table(replicates) < 2)) stop("Not every sample has at least 2 replicates!")
 }
 
 #' @title init_selected
@@ -96,11 +57,11 @@ init_selected <- function(init, data, replicates){
     # features were given
     if (is.null(init)){
         data <- data.frame(data)
-        f <- sapply(seq_len(dim(data)[[2]]), function(x){
-          m <- lm(replicates~data[,x])
-          s <- summary(m)
-          s$fstatistic[1]
-        })
+        f <- vapply(seq_len(dim(data)[[2]]), function(x){
+            m <- stats::lm(replicates~data[,x])
+            s <- summary(m)
+            s$fstatistic[1]
+        }, numeric(1))
         names(f) <-  features
         init <- names(which.min(f))
     }
