@@ -20,7 +20,6 @@ Suggests:
     knitr,
     BiocStyle,
     DmelSGI,
-    matrixStats,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 biocViews: Software, StatisticalMethod, FeatureExtraction
