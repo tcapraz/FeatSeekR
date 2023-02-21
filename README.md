@@ -23,6 +23,7 @@ BiocManager::install("FeatSeekR")
 
 # How to run
 
+See vignette for more detailed examples.
 
 ```{r}
 set.seed(111)
