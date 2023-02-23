@@ -135,7 +135,7 @@ calcFstat <- function(data,reps, scale=TRUE){
 
     data <- scale(data)
     f <- vapply(seq_len(dim(data)[2]), function(x){
-        m <- stats::lm(reps~data[,x])
+        m <- stats::lm(data[,x] ~as.factor(reps))
         s <- summary(m)
         f <- s$fstatistic[1]
         }, numeric(1))
