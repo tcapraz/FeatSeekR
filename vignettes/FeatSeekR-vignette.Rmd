@@ -76,10 +76,10 @@ colors        <- c("red", "blue", "darkorange", "darkgreen", "black")
 names(colors) <- c("1", "2", "3", "4", "5")
 anno_colors <- list(Latent_factor = colors)
 pheatmap::pheatmap(cor, treeheight_row = 0 , treeheight_col = 0, 
-         show_rownames = FALSE, show_colnames = FALSE,
-         breaks = seq(-range, range, length.out = 100), cellwidth = 6, 
-         cellheight = 6, annotation_col = anno, annotation_colors = anno_colors, 
-         fontsize = 8)
+        show_rownames = FALSE, show_colnames = FALSE,
+        breaks = seq(-range, range, length.out = 100), cellwidth = 6, 
+        cellheight = 6, annotation_col = anno, annotation_colors = anno_colors, 
+        fontsize = 8)
 ```
 As expected, the features cluster together according to their underlying latent
 factor.
