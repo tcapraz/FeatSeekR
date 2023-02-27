@@ -14,7 +14,16 @@ variance_explained <- function(data,selected){
     # model remaining features by selected features
     model <- stats::lm(rest ~  data_sel + 0)
     # model holds a fit for each remaining feature
-    s <- suppressWarnings(summary(model))
+    # catch warning that fit is perfect, as this is expected at certain number
+    # of selected features
+    s <- withCallingHandlers(summary(model),
+                             warning = function(w){
+                               if(startsWith(conditionMessage(w), "essentially perfect fit")){
+                                 invokeRestart("muffleWarning")
+                               } else {
+                                 message(w$message)
+                               }
+                             })
     r <- mean(vapply(s, function(x){
         x$r.squared
     }, numeric(1)))
