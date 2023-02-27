@@ -53,8 +53,8 @@ FeatSeek <- function(data, replicates, max_features=NULL, init=NULL) {
         data.frame(
             metric = rep(NA, max_features),    # selection metric
             selected = rep("", max_features),  # name of selected features
-            explained_variance = rep(NA, max_features) # variance explained by
-                                                       # selected features
+            explained_variance = rep(NA, max_features)
+            # variance explained by selected features
         )
 
     metric_all <- list()

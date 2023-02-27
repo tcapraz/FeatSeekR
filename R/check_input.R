@@ -88,7 +88,7 @@ filter <- function(data, init, filter_thr){
     # i.e. the off-diagonal values of the correlation matrix
     cor <- apply(data,2, function(x)
         mean(stats::cor(x, use="pairwise.complete.obs")
-             [upper.tri(!diag(nrow=dim(data)[3]))]))
+            [upper.tri(!diag(nrow=dim(data)[3]))]))
     keep <-  cor > filter_thr
     features <- dimnames(data)[[2]]
     init_keep <- features %in% init
