@@ -4,11 +4,13 @@
 #'
 #'
 #'
-#' @param data 2 dimensional array with samples x features, where each sample
-#' belongs to a different replicate
+#' @param data SummarizedExperiment with assay named data, where each sample
+#' belongs to a different replicate. Which sample belongs to which replicate
+#' should indicated in colData slot replicates. Or matrix with features x samples.
 #'
 #' @param replicates numeric vector of length samples,
-#' indicating which sample belongs to which replicate
+#' indicating which sample belongs to which replicate. Only required if data is
+#' provided as matrix.
 #' @param init vector with names of initial features.
 #' If NULL the feature with highest F-statistic will be used
 #' @param max_features integer number of features to rank
@@ -25,24 +27,23 @@
 #' # res stores the 20 selected features ranked by their replicate reproducibility
 #'
 #' @export
-FeatSeek <- function(data, replicates, max_features=NULL, init=NULL) {
+FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL) {
 
-    check_input(data, replicates, max_features)
-    n <- dim(data)[1]
-    p <- dim(data)[2]
-    r <- length(unique(replicates))
+    se <- check_input(data, max_features,replicates)
+    # data <- inputs[[1]]
+    # replicates <- inputs[[2]]
+
+    p <- dim(assays(se)$data)[1]
+    n <- dim(assays(se)$data)[2]
+    r <- length(unique(colData(se)$replicates))
 
     # initialize starting set of features
-    init <- init_selected(init, data, replicates)
+    init <- init_selected(init, se)
 
     message("Input data has: \n",
             n, " samples \n",
             r, " replicates \n",
             p, " features")
-
-    n <- dim(data)[1]
-    p <- dim(data)[2]
-    r <- length(unique(replicates))
 
     # init max_features
     if(is.null(max_features)){
@@ -63,6 +64,8 @@ FeatSeek <- function(data, replicates, max_features=NULL, init=NULL) {
     S <- array(NA, dim=c(n,p))
     k <- 1
 
+    data <- t(assays(se)$data)
+    replicates <- colData(se)$replicates
     data0 <- data
     # start ranking features
     # in each iteration we select the feature with
@@ -114,7 +117,8 @@ FeatSeek <- function(data, replicates, max_features=NULL, init=NULL) {
     res$explained_variance <- vapply(seq_along(res$selected), function(i){
         variance_explained(data0,res$selected[seq_len(i)])
     }, numeric(1))
-    res
+    se_res <- SummarizedExperiment::SummarizedExperiment(assays=list(selected=t(data0[,res$selected])), rowData=res)
+    se_res
 }
 
 

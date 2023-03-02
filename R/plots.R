@@ -17,7 +17,7 @@
 #'
 #' @export
 plotVarianceExplained <- function(res){
-    plot(seq_len(nrow(res)), res$explained_variance,
+    plot(seq_len(nrow(res)), rowData(res)$explained_variance,
         xlab = "Number of selected features",
         ylab = "Fraction of explained variance")
 }
@@ -28,9 +28,8 @@ plotVarianceExplained <- function(res){
 #'
 #' @description plot correlation matrix of selected feature sets
 #'
-#' @param data 3 dimensional array with samples x features x replicates
-#' @param res result dataframe from FeatSeek function
-#' @param n_features number of features to plot. if NULL then the maximum number
+#' @param res result SummarizedExperiment from FeatSeek function
+#' @param n_features top n_features to plot. if NULL then the maximum number
 #'  of features in res will be plotted
 #'
 #' @return returns heatmap of selected features
@@ -47,16 +46,11 @@ plotVarianceExplained <- function(res){
 #' plotSelectedFeatures(data, res, n_features=5)
 #'
 #' @export
-plotSelectedFeatures <- function(data, res, n_features=NULL){
-    if (length(dim(data)) == 3){
-        cnames <- dimnames(data)[[2]]
-        data <- apply(data, c(1,2), mean )
-        colnames(data) <- cnames
-    }
+plotSelectedFeatures <- function(res, n_features=NULL){
     if (is.null(n_features)){
         n_features <- nrow(res)
     }
-    cor <- stats::cor(data[,res$selected[seq_len(n_features)]], use = "pairwise.complete.obs")
+    cor <- stats::cor(t(assays(res)$selected)[,seq_len(n_features)], use = "pairwise.complete.obs")
 
     range <- max(abs(cor))
     pheatmap::pheatmap(cor, treeheight_row = 0, treeheight_col = 0, legend=TRUE,
