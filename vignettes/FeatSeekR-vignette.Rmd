@@ -60,18 +60,17 @@ samples <- 500
 latent_factors <- 5
 replicates <- 3
 
-sim <- FeatSeekR::simData(samples=samples,latent_factors =latent_factors,
+sim <- FeatSeekR::simData(samples=samples,n_latent_factors =latent_factors,
                 replicates = replicates)
-data <- sim[[1]]
-reps <- sim[[2]]
+
 # calculate the feature correlation for first replicate
-cor <- stats::cor(data[reps==1,], use = "pairwise.complete.obs")
+cor <- stats::cor(t(assay(sim))[sim@colData$replicates==1,], use = "pairwise.complete.obs")
 
 range <- max(abs(cor))
 # plot a heatmap of the features and color features according to their 
 # generating latent factors
 anno <- data.frame(Latent_factor = as.factor(rep(1:5, each=10)))
-rownames(anno) <- dimnames(data)[[2]]
+rownames(anno) <- dimnames(sim)[[1]]
 colors        <- c("red", "blue", "darkorange", "darkgreen", "black")
 names(colors) <- c("1", "2", "3", "4", "5")
 anno_colors <- list(Latent_factor = colors)
@@ -88,10 +87,10 @@ reproducibility.
 
 ```{r plot top 5}
 # select the top 5 features
-res <- FeatSeek(data, replicates =reps, max_features=5)
+res <- FeatSeek(sim,  max_features=5)
 
 # plot a heatmap of the top 5 selected features 
-FeatSeekR::plotSelectedFeatures(data, res)
+FeatSeekR::plotSelectedFeatures(res)
 ```
 
 The top 5 selected features are each from different latent factor and low
@@ -136,7 +135,7 @@ FeatSeek to identify unique features with high replicate consistency.
 ```{r select_features}
 # select up to 50 features
 max_features <- 20
-res <- FeatSeekR::FeatSeek(data, replicates = reps, max_features = max_features)
+res <- FeatSeekR::FeatSeek(t(data), replicates = reps, max_features = max_features)
 ```
 
 We can further inspect the selected features by plotting the fraction of explained variance per selected feature.
@@ -150,9 +149,9 @@ and plot their correlation matrix.
 
 ```{r plot selection}
 # get number of features which explain at least 70% of the total variance
-n_feat <- min(which(res$explained_variance > 0.7))
+n_feat <- min(which(rowData(res)$explained_variance > 0.7))
 
-FeatSeekR::plotSelectedFeatures(data,res, n_features = n_feat)
+FeatSeekR::plotSelectedFeatures(res, n_features = n_feat)
 ```
 
 
