@@ -4,14 +4,12 @@
 \alias{plotSelectedFeatures}
 \title{plotSelectedFeatures}
 \usage{
-plotSelectedFeatures(data, res, n_features = NULL)
+plotSelectedFeatures(res, n_features = NULL)
 }
 \arguments{
-\item{data}{3 dimensional array with samples x features x replicates}
+\item{res}{result SummarizedExperiment from FeatSeek function}
 
-\item{res}{result dataframe from FeatSeek function}
-
-\item{n_features}{number of features to plot. if NULL then the maximum number
+\item{n_features}{top n_features to plot. if NULL then the maximum number
 of features in res will be plotted}
 }
 \value{
@@ -22,13 +20,13 @@ plot correlation matrix of selected feature sets
 }
 \examples{
 # run FeatSeek to select the top 20 features
-data <-  array(rnorm(100*30), dim=c(100,30),
-dimnames <- list(NULL, paste("feature", seq_len(30))))
+data <-  array(rnorm(100*30), dim=c(30,100),
+            dimnames = list(paste("feature", seq_len(30)), NULL))
 reps <- rep(c(1,2), each=50)
 res <- FeatSeek(data, reps, max_features=20)
 
 # res stores the 20 selected features ranked by their replicate reproducibility
 # plot the top 5 features
-plotSelectedFeatures(data, res, n_features=5)
+plotSelectedFeatures(res, n_features=5)
 
 }

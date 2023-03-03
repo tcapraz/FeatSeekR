@@ -4,13 +4,12 @@
 \alias{init_selected}
 \title{init_selected}
 \usage{
-init_selected(init, data, replicates)
+init_selected(init, se)
 }
 \arguments{
 \item{init}{preselected starting set of features}
 
-\item{data}{input data
-(3 dimensional array with samples x features x replicates)}
+\item{data}{input data as SummarizedExperiment}
 }
 \value{
 names of initial set of feature

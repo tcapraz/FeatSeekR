@@ -4,26 +4,22 @@
 \alias{check_input}
 \title{check_input}
 \usage{
-check_input(data, replicates, max_features)
+check_input(data, max_features, replicates = NULL)
 }
 \arguments{
-\item{data}{input data provided to FeatSeek}
+\item{data}{input data provided to FeatSeek either SummarizedExperiment or
+2 dimensional array with features x samples}
 
-\item{replicates}{if data is a 2 dimensional array with samples x features
-a dataframe with 2 columns named sample and replicates indicating which
-sample corresponds to which replicate must be provided}
+\item{replicates}{if data is a 2 dimensional array with features x samples
+a vector indicating which sample corresponds to which replicate
+must be provided}
 }
 \value{
-input data reshaped to 3 dimensional array with
-samples x features x replicates
+SummarizedExperiment where replicate information is stored in colData
 }
 \description{
-Checks input data. Input data should be a 3 dimensional array
-with samples x features x replicates or
-list of replicate matrices or dataframes. Each matrix or dataframe
-corresponds to a replicate and
-should have matching dimensions (samples x features).
-Column names should correspond to feature names
-and must match between replicates.
+Checks input data. Input data should be a 2 dimensional array
+with samples x features or SummarizedExperiment carrying one assay named data
+and colData indicating which sample belongs to which replicate
 }
 \keyword{internal}

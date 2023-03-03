@@ -22,6 +22,7 @@ vignette: >
 library(FeatSeekR)
 library(DmelSGI)
 library(pheatmap)
+library(SummarizedExperiment)
 ```
 
 

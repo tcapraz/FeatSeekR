@@ -4,14 +4,16 @@
 \alias{FeatSeek}
 \title{FeatSeek}
 \usage{
-FeatSeek(data, replicates, max_features = NULL, init = NULL)
+FeatSeek(data, replicates = NULL, max_features = NULL, init = NULL)
 }
 \arguments{
-\item{data}{2 dimensional array with samples x features, where each sample
-belongs to a different replicate}
+\item{data}{SummarizedExperiment with assay named data, where each sample
+belongs to a different replicate. Which sample belongs to which replicate
+should indicated in colData slot replicates. Or matrix with features x samples.}
 
 \item{replicates}{numeric vector of length samples,
-indicating which sample belongs to which replicate}
+indicating which sample belongs to which replicate. Only required if data is
+provided as matrix.}
 
 \item{max_features}{integer number of features to rank}
 
@@ -19,8 +21,10 @@ indicating which sample belongs to which replicate}
 If NULL the feature with highest F-statistic will be used}
 }
 \value{
-Dataframe with selected feature names,
-F-statistic and explained variance
+SummarizedExperiment containing one assay with the selected features.
+rowData stores for each selected feature the F-statistic under metric,
+the cumulative explained variance under explained_variance and
+the feature names under selected´
 }
 \description{
 This function ranks features of a 2
@@ -28,8 +32,8 @@ dimensional array according to their reproducibility between replicates.
 }
 \examples{
 # run FeatSeek to select the top 20 features
-data <-  array(rnorm(100*30), dim=c(100,30),
-dimnames <- list(NULL, paste("feature", seq_len(30))))
+data <-  array(rnorm(100*30), dim=c(30,100),
+dimnames <- list(paste("feature", seq_len(30)), NULL))
 reps <- rep(c(1,2), each=50)
 res <- FeatSeek(data, reps, max_features=20)
 

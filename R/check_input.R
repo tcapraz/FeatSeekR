@@ -5,14 +5,14 @@
 #' and colData indicating which sample belongs to which replicate
 #'
 #'
-#' @param data input data provided to FeatSeek
-#' @param replicates if data is a 2 dimensional array with samples x features
+#' @param data input data provided to FeatSeek either SummarizedExperiment or
+#' 2 dimensional array with features x samples
+#' @param replicates if data is a 2 dimensional array with features x samples
 #' a vector indicating which sample corresponds to which replicate
 #' must be provided
 #'
 #'
-#' @return input data reshaped to 3 dimensional array with
-#' samples x features x replicates
+#' @return SummarizedExperiment where replicate information is stored in colData
 #'
 #' @keywords internal
 check_input <- function(data, max_features, replicates=NULL){
@@ -22,15 +22,15 @@ check_input <- function(data, max_features, replicates=NULL){
     } else {
         se <- data
     }
-    fnames <- rownames(assays(se)$data)
+    fnames <- rownames(SummarizedExperiment::assays(se)$data)
     if (all(vapply(fnames, function(x) is.null(x), logical(1)))) stop(
         "No feature names given or features not in correct dimension of data array!")
 
-    if (!is.null(max_features) & max_features > dim(assays(se)$data)[1]) stop("Max features higher than features in data!")
+    if (!is.null(max_features) & max_features > dim(SummarizedExperiment::assays(se)$data)[1]) stop("Max features higher than features in data!")
 
-    if( length(unique(colData(se)$replicates)) < 2) stop("At least 2 replicates required!")
-    if (!length(colData(se)$replicates) == dim(assays(se)$data)[2]) stop("Replicate indicator vector not same length as samples in data!")
-    if (any(table(colData(se)$replicates) < 2)) stop("Not every sample has at least 2 replicates!")
+    if( length(unique(SummarizedExperiment::colData(se)$replicates)) < 2) stop("At least 2 replicates required!")
+    if (!length(SummarizedExperiment::colData(se)$replicates) == dim(SummarizedExperiment::assays(se)$data)[2]) stop("Replicate indicator vector not same length as samples in data!")
+    if (any(table(SummarizedExperiment::colData(se)$replicates) < 2)) stop("Not every sample has at least 2 replicates!")
     se
 }
 
@@ -40,8 +40,8 @@ check_input <- function(data, max_features, replicates=NULL){
 #' If init is NULL, it is set to feature with highest replicate correlation.
 #'
 #' @param init preselected starting set of features
-#' @param data input data
-#' (3 dimensional array with samples x features x replicates)
+#' @param data input data as SummarizedExperiment
+#'
 #'
 #'
 #' @return names of initial set of feature
@@ -49,8 +49,8 @@ check_input <- function(data, max_features, replicates=NULL){
 #' @keywords internal
 init_selected <- function(init, se){
 
-    features <- dimnames(assays(se)$data)[[1]]
-    replicates <- colData(se)$replicates
+    features <- dimnames(SummarizedExperiment::assays(se)$data)[[1]]
+    replicates <- SummarizedExperiment::colData(se)$replicates
     if (is.null(features)) stop("No feature names given or features not in correct dimension of data array!")
     # check if init features are in data
     if(!is.null(init) & !all(init %in% features)){
@@ -60,10 +60,18 @@ init_selected <- function(init, se){
     # start with feature with highest replicate correlation if no init
     # features were given
     if (is.null(init)){
-        data <- t(data.frame(assays(se)$data))
+        data <- t(data.frame(SummarizedExperiment::assays(se)$data))
         f <- vapply(seq_len(dim(data)[[2]]), function(x){
             m <- stats::lm(replicates~data[,x])
-            s <- summary(m)
+            s <- withCallingHandlers(summary(m),
+                                warning = function(w){
+                                    if(startsWith(conditionMessage(w),
+                                        "essentially perfect fit")){
+                                        invokeRestart("muffleWarning")
+                                    } else {
+                                        message(w$message)
+                                    }
+                                })
             s$fstatistic[1]
         }, numeric(1))
         names(f) <-  features

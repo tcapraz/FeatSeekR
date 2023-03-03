@@ -7,7 +7,7 @@
 plotVarianceExplained(res)
 }
 \arguments{
-\item{res}{result dataframe from FeatSeek function}
+\item{res}{result SummarizedExperiment from FeatSeek function}
 }
 \value{
 returns plot of variance explained vs number of features
@@ -17,8 +17,8 @@ plot variance explained from 1 to max_features in res
 }
 \examples{
 # run FeatSeek to select the top 20 features
-data <-  array(rnorm(100*30), dim=c(100,30),
-dimnames <- list(NULL, paste("feature", seq_len(30))))
+data <-  array(rnorm(100*30), dim=c(30,100),
+            dimnames = list(paste("feature", seq_len(30)), NULL))
 reps <- rep(c(1,2), each=50)
 res <- FeatSeek(data, reps, max_features=20)
 

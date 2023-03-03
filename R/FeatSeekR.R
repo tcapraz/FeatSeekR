@@ -14,13 +14,15 @@
 #' @param init vector with names of initial features.
 #' If NULL the feature with highest F-statistic will be used
 #' @param max_features integer number of features to rank
-#' @return Dataframe with selected feature names,
-#' F-statistic and explained variance
+#' @return SummarizedExperiment containing one assay with the selected features.
+#' rowData stores for each selected feature the F-statistic under metric,
+#' the cumulative explained variance under explained_variance and
+#' the feature names under selected´
 #'
 #' @examples
 #' # run FeatSeek to select the top 20 features
-#' data <-  array(rnorm(100*30), dim=c(100,30),
-#' dimnames <- list(NULL, paste("feature", seq_len(30))))
+#' data <-  array(rnorm(100*30), dim=c(30,100),
+#' dimnames <- list(paste("feature", seq_len(30)), NULL))
 #' reps <- rep(c(1,2), each=50)
 #' res <- FeatSeek(data, reps, max_features=20)
 #'
@@ -30,12 +32,10 @@
 FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL) {
 
     se <- check_input(data, max_features,replicates)
-    # data <- inputs[[1]]
-    # replicates <- inputs[[2]]
 
-    p <- dim(assays(se)$data)[1]
-    n <- dim(assays(se)$data)[2]
-    r <- length(unique(colData(se)$replicates))
+    p <- dim(SummarizedExperiment::assays(se)$data)[1]
+    n <- dim(SummarizedExperiment::assays(se)$data)[2]
+    r <- length(unique(SummarizedExperiment::colData(se)$replicates))
 
     # initialize starting set of features
     init <- init_selected(init, se)
@@ -64,8 +64,8 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL) {
     S <- array(NA, dim=c(n,p))
     k <- 1
 
-    data <- t(assays(se)$data)
-    replicates <- colData(se)$replicates
+    data <- t(SummarizedExperiment::assays(se)$data)
+    replicates <- SummarizedExperiment::colData(se)$replicates
     data0 <- data
     # start ranking features
     # in each iteration we select the feature with
