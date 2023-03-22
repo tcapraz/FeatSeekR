@@ -12,7 +12,7 @@ variance_explained <- function(data,selected){
     rest <- data
     data_sel <- data[,selected]
     # model remaining features by selected features
-    model <- stats::lm(rest ~  data_sel + 0)
+    model <- stats::lm(rest ~  data_sel)
     # model holds a fit for each remaining feature
     # catch warning that fit is perfect, as this is expected at certain number
     # of selected features
