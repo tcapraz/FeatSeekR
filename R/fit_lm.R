@@ -6,11 +6,11 @@
 #' projected out of the data by setting each feature
 #' to its residuals from the linear model fit.
 #'
-#' @param data data (3 dimensional array samples x features x replicates)
+#' @param data \code{data} (2 dimensional array samples x features)
 #' @param S set of selected features
 #' @param k current iteration
 #'
-#' @return data with previously selected features projected out
+#' @return \code{data} with previously selected features projected out
 #' 
 #' @importFrom stats lm na.exclude
 #' @importFrom methods is

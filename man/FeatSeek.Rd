@@ -13,26 +13,26 @@ FeatSeek(
 )
 }
 \arguments{
-\item{data}{SummarizedExperiment with assay named data, where each sample
+\item{data}{\code{SummarizedExperiment} with assay named \code{data}, where each sample
 belongs to a different replicate. Which sample belongs to which replicate
-should indicated in colData slot replicates. Or matrix with features x samples.}
+should indicated in \code{colData} slot replicates. Or \code{matrix} with features x samples.}
 
 \item{replicates}{numeric vector of length samples,
-indicating which sample belongs to which replicate. Only required if data is
-provided as matrix.}
+indicating which sample belongs to which replicate. Only required if \code{data} is
+provided as \code{matrix}.}
 
-\item{max_features}{integer number of features to rank}
+\item{max_features}{\code{integer} number of features to rank}
 
-\item{init}{vector with names of initial features.
-If NULL the feature with highest F-statistic will be used}
+\item{init}{\code{character vector} with names of initial features.
+If \code{NULL} the feature with highest F-statistic will be used}
 
-\item{verbose}{logical indicating whether messages should be printed}
+\item{verbose}{\code{logical} indicating whether messages should be printed}
 }
 \value{
-SummarizedExperiment containing one assay with the selected features.
-rowData stores for each selected feature the F-statistic under metric,
-the cumulative explained variance under explained_variance and
-the feature names under selected´
+\code{SummarizedExperiment} containing one assay with the selected features.
+\code{rowData} stores for each selected feature the F-statistic under \code{metric},
+the cumulative explained variance under \code{explained_variance} and
+the feature names under \code{selected}
 }
 \description{
 This function ranks features of a 2

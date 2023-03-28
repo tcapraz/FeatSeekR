@@ -1,7 +1,7 @@
 #' @title plotVarianceExplained
 #' @description plot variance explained from 1 to max_features in res
 #'
-#' @param res result SummarizedExperiment from FeatSeek function
+#' @param res result \code{SummarizedExperiment} from \code{FeatSeek} function
 #'
 #' @return returns plot of variance explained vs number of features
 #'
@@ -38,10 +38,10 @@ plotVarianceExplained <- function(res){
 #'
 #' @description plot correlation matrix of selected feature sets
 #'
-#' @param res result SummarizedExperiment from FeatSeek function
-#' @param n_features top n_features to plot. if NULL then the maximum number
+#' @param res result \code{SummarizedExperiment} from \code{FeatSeek} function
+#' @param n_features top \code{n_features} to plot. if \code{NULL} then the maximum number
 #'  of features in res will be plotted
-#' @param assay assay slot to plot from result SummarizedExperiment object, 
+#' @param assay assay slot to plot from result \code{SummarizedExperiment} object, 
 #'  default is the selected features slot
 #'
 #' @return returns heatmap of selected features

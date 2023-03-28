@@ -1,7 +1,7 @@
 #' @title variance_explained
 #'
-#' @param data 3 dimensional array samples x features x replicates
-#' @param selected character vector of selected features
+#' @param data 2 dimensional \code{array} samples x features 
+#' @param selected \code{character vector} of selected features
 #'
 #' @return average variance explained by selected features
 #'

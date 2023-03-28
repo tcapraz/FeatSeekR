@@ -27,8 +27,8 @@
 #' @param n_latent_factors number of latent factors to generate
 #' @param replicates number of replicates to generate
 #'
-#' @return SummarizedExperiment object carrying simulated data, with colData
-#' indicating which sample belongs to which replicate
+#' @return \code{SummarizedExperiment} object carrying simulated data, with 
+#' \code{colData} indicating which sample belongs to which replicate
 #'
 #' @importFrom MASS mvrnorm
 #' @importFrom pracma gramSchmidt

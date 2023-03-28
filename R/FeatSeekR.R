@@ -4,22 +4,22 @@
 #'
 #'
 #' 
-#' @param data SummarizedExperiment with assay named data, where each sample
+#' @param data \code{SummarizedExperiment} with assay named \code{data}, where each sample
 #' belongs to a different replicate. Which sample belongs to which replicate
-#' should indicated in colData slot replicates. Or matrix with features x samples.
+#' should indicated in \code{colData} slot replicates. Or \code{matrix} with features x samples.
 #'
 #' @param replicates numeric vector of length samples,
-#' indicating which sample belongs to which replicate. Only required if data is
-#' provided as matrix.
-#' @param init vector with names of initial features.
-#' If NULL the feature with highest F-statistic will be used
-#' @param max_features integer number of features to rank
-#' @param verbose logical indicating whether messages should be printed
+#' indicating which sample belongs to which replicate. Only required if \code{data} is
+#' provided as \code{matrix}.
+#' @param init \code{character vector} with names of initial features.
+#' If \code{NULL} the feature with highest F-statistic will be used
+#' @param max_features \code{integer} number of features to rank
+#' @param verbose \code{logical} indicating whether messages should be printed
 #' 
-#' @return SummarizedExperiment containing one assay with the selected features.
-#' rowData stores for each selected feature the F-statistic under metric,
-#' the cumulative explained variance under explained_variance and
-#' the feature names under selected´
+#' @return \code{SummarizedExperiment} containing one assay with the selected features.
+#' \code{rowData} stores for each selected feature the F-statistic under \code{metric},
+#' the cumulative explained variance under \code{explained_variance} and
+#' the feature names under \code{selected}
 #'
 #' @examples
 #' # run FeatSeek to select the top 20 features
@@ -144,19 +144,18 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbos
 
 #' @title calcFstat
 #'
-#' @param data 2 dimensional array with samples x features, where each sample
+#' @param data 2 dimensional \code{array} with samples x features, where each sample
 #' belongs to a different replicate
-#' @param reps numeric vector of length samples,
+#' @param reps \code{numeric vector} of length samples,
 #' indicating which sample belongs to which replicate
-#' @param scale whether to scale the data, default = TRUE
+#' @param scale \code{logical} whether to scale the data, default = TRUE
 #'
 #' @return F-statistic for all features
 #'
 #' @importFrom stats lm
 #' @importFrom methods is
 #' 
-#' @internal
-#'
+#' @keywords internal
 calcFstat <- function(data, reps, scale=TRUE){
     stopifnot(
         is.numeric(data),

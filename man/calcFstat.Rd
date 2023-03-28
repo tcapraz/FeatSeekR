@@ -21,3 +21,4 @@ F-statistic for all features
 \description{
 calcFstat
 }
+\keyword{internal}
