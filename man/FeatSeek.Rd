@@ -4,7 +4,13 @@
 \alias{FeatSeek}
 \title{FeatSeek}
 \usage{
-FeatSeek(data, replicates = NULL, max_features = NULL, init = NULL)
+FeatSeek(
+  data,
+  replicates = NULL,
+  max_features = NULL,
+  init = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{data}{SummarizedExperiment with assay named data, where each sample
@@ -19,6 +25,8 @@ provided as matrix.}
 
 \item{init}{vector with names of initial features.
 If NULL the feature with highest F-statistic will be used}
+
+\item{verbose}{logical indicating whether messages should be printed}
 }
 \value{
 SummarizedExperiment containing one assay with the selected features.

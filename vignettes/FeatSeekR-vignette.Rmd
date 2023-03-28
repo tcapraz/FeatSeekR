@@ -61,8 +61,8 @@ samples <- 500
 latent_factors <- 5
 replicates <- 3
 
-sim <- FeatSeekR::simData(samples=samples,n_latent_factors =latent_factors,
-                replicates = replicates)
+sim <- FeatSeekR::simData(samples=samples, n_latent_factors=latent_factors,
+                replicates=replicates)
 
 # calculate the feature correlation for first replicate
 cor <- stats::cor(t(assay(sim))[sim@colData$replicates==1,], use = "pairwise.complete.obs")
@@ -88,7 +88,7 @@ reproducibility.
 
 ```{r plot top 5}
 # select the top 5 features
-res <- FeatSeek(sim,  max_features=5)
+res <- FeatSeek(sim, max_features=5)
 
 # plot a heatmap of the top 5 selected features 
 FeatSeekR::plotSelectedFeatures(res)

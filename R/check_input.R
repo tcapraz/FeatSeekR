@@ -13,24 +13,25 @@
 #'
 #'
 #' @return SummarizedExperiment where replicate information is stored in colData
-#'
+#' 
+#' @importFrom SummarizedExperiment SummarizedExperiment assay
 #' @keywords internal
 check_input <- function(data, max_features, replicates=NULL){
     if (!inherits(data,"SummarizedExperiment")){
-        reps <- data.frame(replicates =replicates)
-        se <- SummarizedExperiment::SummarizedExperiment(assays=list(data=data), colData=reps)
+        reps <- data.frame(replicates=replicates)
+        se <- SummarizedExperiment(assays=list(data=data), colData=reps)
     } else {
         se <- data
     }
-    fnames <- rownames(SummarizedExperiment::assays(se)$data)
+    fnames <- rownames(se)
     if (all(vapply(fnames, function(x) is.null(x), logical(1)))) stop(
         "No feature names given or features not in correct dimension of data array!")
 
-    if (!is.null(max_features) & max_features > dim(SummarizedExperiment::assays(se)$data)[1]) stop("Max features higher than features in data!")
+    if (!is.null(max_features) & max_features > nrow(se)) stop("Max features higher than features in data!")
 
-    if( length(unique(SummarizedExperiment::colData(se)$replicates)) < 2) stop("At least 2 replicates required!")
-    if (!length(SummarizedExperiment::colData(se)$replicates) == dim(SummarizedExperiment::assays(se)$data)[2]) stop("Replicate indicator vector not same length as samples in data!")
-    if (any(table(SummarizedExperiment::colData(se)$replicates) < 2)) stop("Not every sample has at least 2 replicates!")
+    if( length(unique(se$replicates)) < 2) stop("At least 2 replicates required!")
+    if (!length(se$replicates) == ncol(se)) stop("Replicate indicator vector not same length as samples in data!")
+    if (any(table(se$replicates) < 2)) stop("Not every sample has at least 2 replicates!")
     se
 }
 
@@ -46,11 +47,20 @@ check_input <- function(data, max_features, replicates=NULL){
 #'
 #' @return names of initial set of feature
 #'
+#' @importFrom SummarizedExperiment assay
+#' @importFrom stats lm
+#' @importFrom methods is
+#' 
 #' @keywords internal
 init_selected <- function(init, se){
-
-    features <- dimnames(SummarizedExperiment::assays(se)$data)[[1]]
-    replicates <- SummarizedExperiment::colData(se)$replicates
+    stopifnot(
+        is(se, "SummarizedExperiment"),
+        # 'n_features' should be a scalar integer and 
+        # mustn't exeed the number of available features
+        is.character(init) | is.null(init)
+    )
+    features <- dimnames(assay(se, "data"))[[1]]
+    replicates <- se$replicates
     if (is.null(features)) stop("No feature names given or features not in correct dimension of data array!")
     # check if init features are in data
     if(!is.null(init) & !all(init %in% features)){
@@ -60,9 +70,9 @@ init_selected <- function(init, se){
     # start with feature with highest replicate correlation if no init
     # features were given
     if (is.null(init)){
-        data <- t(data.frame(SummarizedExperiment::assays(se)$data))
+        data <- t(data.frame(assay(se, "data")))
         f <- vapply(seq_len(dim(data)[[2]]), function(x){
-            m <- stats::lm(replicates~data[,x])
+            m <- lm(replicates ~ data[,x])
             s <- withCallingHandlers(summary(m),
                                 warning = function(w){
                                     if(startsWith(conditionMessage(w),
@@ -81,33 +91,4 @@ init_selected <- function(init, se){
 }
 
 
-#' @title filter
-#'
-#' @description This function removes features with mean pairwise replicate
-#' pearson correlation < filter_thr
-#'
-#' @param data 3 dimensional array with samples x features x replicates.
-#' @param filter_thr Mean pairwise replicate pearson correlation threshold
-#'
-#'
-#' @return the filtered data array
-#'
-#' @keywords internal
-filter <- function(data, init, filter_thr){
-    message("Filtering out features with correlation < filter_thr
-            across replicates!")
-    # get mean of pairwise correlation between replicates,
-    # i.e. the off-diagonal values of the correlation matrix
-    cor <- apply(data,2, function(x)
-        mean(stats::cor(x, use="pairwise.complete.obs")
-            [upper.tri(!diag(nrow=dim(data)[3]))]))
-    keep <-  cor > filter_thr
-    features <- dimnames(data)[[2]]
-    init_keep <- features %in% init
-    features <- features[init_keep | keep]
-    data <- data[, features,]
-    p <- dim(data)[2] # get number of remaining features
-    message("Remaining features: ", p)
-    data
-}
 

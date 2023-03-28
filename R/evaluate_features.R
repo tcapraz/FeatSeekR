@@ -5,14 +5,21 @@
 #'
 #' @return average variance explained by selected features
 #'
+#' @importFrom stats lm
+#' @importFrom methods is
+#' 
 #' @keywords internal
-variance_explained <- function(data,selected){
-
+variance_explained <- function(data, selected){
+    stopifnot(
+        is.numeric(data),
+        is.character(selected),
+        length(selected) <= ncol(data)
+    )
     # calculate the fraction of variance explained by the selected feature set for each remaining feature.
     rest <- data
-    data_sel <- data[,selected]
+    data_sel <- data[, selected]
     # model remaining features by selected features
-    model <- stats::lm(rest ~  data_sel)
+    model <- lm(rest ~ data_sel + 0)
     # model holds a fit for each remaining feature
     # catch warning that fit is perfect, as this is expected at certain number
     # of selected features
