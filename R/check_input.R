@@ -72,7 +72,7 @@ init_selected <- function(init, se){
     if (is.null(init)){
         data <- t(data.frame(assay(se, "data")))
         f <- vapply(seq_len(dim(data)[[2]]), function(x){
-            m <- lm(replicates ~ data[,x])
+            m <- lm(replicates ~ data[, x])
             s <- withCallingHandlers(summary(m),
                                 warning = function(w){
                                     if(startsWith(conditionMessage(w),
