@@ -6,8 +6,8 @@ strengths include interpretability, conceptual simplicity, transferability
 and modularity.
 Here, we introduce the `FeatSeekR` package, which selects features based on 
 the consistency of their signal across replicates and their non-redundancy.
-It takes a 2 dimensional array (samples x features) of replicated measurements
-and returns a dataframe storing the selected and features ranked by 
+It takes a 2 dimensional array (features x samples) of replicated measurements
+and returns a `SummarizedExperiment` object storing the selected and features ranked by 
 reproducibility. This work was motivated by [[1]](#1) who devised a special case of
 our current method to use it on microscopy data, but did not implement it as R package.
 
