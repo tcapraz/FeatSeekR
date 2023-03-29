@@ -14,8 +14,8 @@ simData(samples, n_latent_factors, replicates)
 \item{replicates}{number of replicates to generate}
 }
 \value{
-SummarizedExperiment object carrying simulated data, with colData
-indicating which sample belongs to which replicate
+\code{SummarizedExperiment} object carrying simulated data, with 
+\code{colData} indicating which sample belongs to which replicate
 }
 \description{
 simulate Data with orthogonal feature clusters and replicated

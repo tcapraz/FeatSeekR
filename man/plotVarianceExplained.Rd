@@ -7,7 +7,7 @@
 plotVarianceExplained(res)
 }
 \arguments{
-\item{res}{result SummarizedExperiment from FeatSeek function}
+\item{res}{result \code{SummarizedExperiment} from \code{FeatSeek} function}
 }
 \value{
 returns plot of variance explained vs number of features

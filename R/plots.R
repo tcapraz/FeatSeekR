@@ -23,11 +23,10 @@ plotVarianceExplained <- function(res){
         is(res, "SummarizedExperiment")
     )
     if (is.null(rowData(res)$explained_variance)){
-        stop("'res' does not contain attribute explained_variance 
-        Please run FeatSeek first!")
+        stop("'res' does not contain attribute explained_variance. Please run FeatSeek first!")
     }
 
-    plot(seq_len(nrow(res)), res$explained_variance,
+    plot(seq_len(nrow(res)), rowData(res)$explained_variance,
         xlab="Number of selected features",
         ylab="Fraction of explained variance")
 }

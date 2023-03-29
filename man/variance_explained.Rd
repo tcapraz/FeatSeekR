@@ -7,9 +7,9 @@
 variance_explained(data, selected)
 }
 \arguments{
-\item{data}{3 dimensional array samples x features x replicates}
+\item{data}{2 dimensional \code{array} samples x features}
 
-\item{selected}{character vector of selected features}
+\item{selected}{\code{character vector} of selected features}
 }
 \value{
 average variance explained by selected features

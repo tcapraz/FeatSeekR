@@ -17,8 +17,9 @@
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
 #' @keywords internal
 check_input <- function(data, max_features, replicates=NULL){
-    if (!inherits(data,"SummarizedExperiment")){
+    if (!is(data,"SummarizedExperiment")){
         reps <- data.frame(replicates=replicates)
+        if (!length(replicates) == ncol(data)) stop("Replicate indicator vector not same length as samples in data!")
         se <- SummarizedExperiment(assays=list(data=data), colData=reps)
     } else {
         se <- data
@@ -30,7 +31,6 @@ check_input <- function(data, max_features, replicates=NULL){
     if (!is.null(max_features) & max_features > nrow(se)) stop("Max features higher than features in data!")
 
     if( length(unique(se$replicates)) < 2) stop("At least 2 replicates required!")
-    if (!length(se$replicates) == ncol(se)) stop("Replicate indicator vector not same length as samples in data!")
     if (any(table(se$replicates) < 2)) stop("Not every sample has at least 2 replicates!")
     se
 }

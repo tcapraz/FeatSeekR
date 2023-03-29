@@ -7,13 +7,13 @@
 calcFstat(data, reps, scale = TRUE)
 }
 \arguments{
-\item{data}{2 dimensional array with samples x features, where each sample
+\item{data}{2 dimensional \code{array} with samples x features, where each sample
 belongs to a different replicate}
 
-\item{reps}{numeric vector of length samples,
+\item{reps}{\code{numeric vector} of length samples,
 indicating which sample belongs to which replicate}
 
-\item{scale}{whether to scale the data, default = TRUE}
+\item{scale}{\code{logical} whether to scale the data, default = TRUE}
 }
 \value{
 F-statistic for all features

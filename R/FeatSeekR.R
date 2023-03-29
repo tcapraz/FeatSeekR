@@ -1,3 +1,32 @@
+
+
+#' FeatSeekR an R package for unsupervised feature selection
+#' 
+#' FeatSeekR performs unsupervised feature selection using replicated 
+#' measurements. It iteratively selects features with the highest 
+#' reproducibility across replicates, after projecting out those dimensions 
+#' from the data that are spanned by the previously selected features. The 
+#' selected a set of features has a high replicate reproducibility and a high 
+#' degree of uniqueness.
+#' 
+#' For information on how to use this package please type 
+#' \code{vignette("FeatSeekR-vignette")}.
+#' 
+#' Please post questions regarding the package to the Bioconductor Support Site:
+#' 
+#' \url{https://support.bioconductor.org}
+#' 
+#' @author Tümay Capraz
+#' 
+#' @docType package
+#' @name FeatSeekR
+#' @keywords package
+NULL
+
+
+
+
+
 #' @title FeatSeek
 #' @description This function ranks features of a 2
 #' dimensional array according to their reproducibility between replicates.

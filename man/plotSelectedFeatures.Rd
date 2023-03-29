@@ -7,12 +7,12 @@
 plotSelectedFeatures(res, n_features = NULL, assay = "selected")
 }
 \arguments{
-\item{res}{result SummarizedExperiment from FeatSeek function}
+\item{res}{result \code{SummarizedExperiment} from \code{FeatSeek} function}
 
-\item{n_features}{top n_features to plot. if NULL then the maximum number
+\item{n_features}{top \code{n_features} to plot. if \code{NULL} then the maximum number
 of features in res will be plotted}
 
-\item{assay}{assay slot to plot from result SummarizedExperiment object, 
+\item{assay}{assay slot to plot from result \code{SummarizedExperiment} object, 
 default is the selected features slot}
 }
 \value{

@@ -7,14 +7,14 @@
 fit_lm(data, S, k)
 }
 \arguments{
-\item{data}{data (3 dimensional array samples x features x replicates)}
+\item{data}{\code{data} (2 dimensional array samples x features)}
 
 \item{S}{set of selected features}
 
 \item{k}{current iteration}
 }
 \value{
-data with previously selected features projected out
+\code{data} with previously selected features projected out
 }
 \description{
 Fit linear model for each feature as a function of

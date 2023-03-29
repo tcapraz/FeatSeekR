@@ -7,19 +7,19 @@
 check_input(data, max_features, replicates = NULL)
 }
 \arguments{
-\item{data}{input data provided to FeatSeek either SummarizedExperiment or
-2 dimensional array with features x samples}
+\item{data}{input \code{data} provided to \code{FeatSeek} either \code{SummarizedExperiment} or
+2 dimensional \code{array} with features x samples}
 
-\item{replicates}{if data is a 2 dimensional array with features x samples
+\item{replicates}{if \code{data} is a 2 dimensional \code{array} with features x samples
 a vector indicating which sample corresponds to which replicate
 must be provided}
 }
 \value{
-SummarizedExperiment where replicate information is stored in colData
+\code{SummarizedExperiment} where replicate information is stored in colData
 }
 \description{
-Checks input data. Input data should be a 2 dimensional array
-with samples x features or SummarizedExperiment carrying one assay named data
-and colData indicating which sample belongs to which replicate
+Checks input \code{data}. Input \code{data} should be a 2 dimensional \code{array}
+with samples x features or \code{SummarizedExperiment} carrying one assay named \code{data}
+and \code{colData} indicating which sample belongs to which replicate
 }
 \keyword{internal}

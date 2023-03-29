@@ -13,8 +13,16 @@ test_that("fit lm returns data correctly",{
     S3 <- data_redundant[, 1:2,  drop = FALSE]
     # S3[, 1] = apply(data_redundant[, 1, , drop = FALSE], 1, mean, na.rm = TRUE)
     # S3[, 2] = apply(data_redundant[, 2, , drop = FALSE], 1, mean, na.rm = TRUE)
-
-
+    out <- fit_lm(data, S1, 2)
+    
+    
+    expect_error(fit_lm(data, 1, 2))
+    expect_error(fit_lm(data, S1, c(1,2)))
+    expect_error(fit_lm(data, S1, 10))
+    
+    expect_true(is(out, "array"))
+    expect_true(all(colnames(out) == c("first", "second", "third")))
+    
     # return correct shape
     expect_identical(dim(fit_lm(data, S1, 2)), dim(data))
     expect_identical(dim(fit_lm(data, S2, 2)), dim(data))
