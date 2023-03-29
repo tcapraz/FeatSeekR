@@ -11,9 +11,6 @@ and returns a dataframe storing the selected and features ranked by
 reproducibility. This work was motivated by [[1]](#1) who devised a special case of
 our current method to use it on microscopy data, but did not implement it as R package.
 
-## References
-<a id="1">[1]</a> 
-Fischer, B., Sandmann, T., Horn, T., Billmann, M., Chaudhary, V., Huber, W. and Boutros, M., 2015. A map of directional genetic interactions in a metazoan cell. Elife, 4, p.e05464.
 
 # Installation
 
@@ -48,4 +45,10 @@ res <- FeatSeek(data, replicates =reps, max_features=5)
 
 # plot a heatmap of the top 5 selected features 
 FeatSeekR::plotSelectedFeatures(data, res)
+```
+
+
+## References
+<a id="1">[1]</a> 
+Fischer, B., Sandmann, T., Horn, T., Billmann, M., Chaudhary, V., Huber, W. and Boutros, M., 2015. A map of directional genetic interactions in a metazoan cell. Elife, 4, p.e05464.
 ```
