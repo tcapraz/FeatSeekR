@@ -13,7 +13,8 @@ selected a set of features has a high replicate reproducibility and a high
 degree of uniqueness.
 }
 \details{
-For information how use this 
+For information on how to use this package please type 
+\code{vignette("FeatSeekR-vignette")}.
 
 Please post questions regarding the package to the Bioconductor Support Site:
 
