@@ -33,20 +33,23 @@ NULL
 #'
 #'
 #' 
-#' @param data \code{SummarizedExperiment} with assay named \code{data}, where each sample
+#' @param data \code{SummarizedExperiment} with assay named \code{data}, 
+#' where each sample
 #' belongs to a different replicate. Which sample belongs to which replicate
-#' should indicated in \code{colData} slot replicates. Or \code{matrix} with features x samples.
+#' should indicated in \code{colData} slot replicates. Or \code{matrix} 
+#' with features x samples.
 #'
 #' @param replicates numeric vector of length samples,
-#' indicating which sample belongs to which replicate. Only required if \code{data} is
-#' provided as \code{matrix}.
+#' indicating which sample belongs to which replicate. Only required if 
+#' \code{data} is provided as \code{matrix}.
 #' @param init \code{character vector} with names of initial features.
 #' If \code{NULL} the feature with highest F-statistic will be used
 #' @param max_features \code{integer} number of features to rank
 #' @param verbose \code{logical} indicating whether messages should be printed
 #' 
-#' @return \code{SummarizedExperiment} containing one assay with the selected features.
-#' \code{rowData} stores for each selected feature the F-statistic under \code{metric},
+#' @return \code{SummarizedExperiment} containing one assay with the 
+#' selected features. \code{rowData} stores for each selected feature the 
+#' F-statistic under \code{metric},
 #' the cumulative explained variance under \code{explained_variance} and
 #' the feature names under \code{selected}
 #'
@@ -57,13 +60,19 @@ NULL
 #' reps <- rep(c(1, 2), each=50)
 #' res <- FeatSeek(data, reps, max_features=20)
 #'
-#' # res stores the 20 selected features ranked by their replicate reproducibility
+#' # res stores the 20 selected features ranked by their replicate 
+#' # reproducibility
 #'
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
 #' @importFrom methods is
 #' 
 #' @export
-FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbose=TRUE) {
+FeatSeek <- function(
+    data, 
+    replicates=NULL, 
+    max_features=NULL, 
+    init=NULL, 
+    verbose=TRUE) {
     stopifnot(
         is.numeric(replicates) | is.null(replicates),
         is.numeric(max_features) | is.null(max_features),
@@ -78,14 +87,12 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbos
 
     # initialize starting set of features
     init <- init_selected(init, se)
-    if (verbose == TRUE){
+    if (verbose){
         message("Input data has: \n",
                 n, " samples \n",
                 r, " replicates \n",
                 p, " features")
     }
-
-
     # init max_features
     if(is.null(max_features)){
         max_features <- p
@@ -98,13 +105,11 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbos
             explained_variance = rep(NA, max_features)
             # variance explained by selected features
         )
-
     metric_all <- list()
-
+    
     # initialize matrix of selected features
     S <- array(NA, dim=c(n, p))
     k <- 1
-
     data <- t(assay(se, "data"))
     replicates <- se$replicates
     data0 <- data
@@ -112,7 +117,7 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbos
     # in each iteration we select the feature with
     # highest consistency between replicates
     # after projecting out the previously selected ones
-    if (verbose == TRUE){
+    if (verbose){
         message("Starting feature ranking!")
     }
     while (k <= max_features)  {
@@ -122,12 +127,12 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbos
         # check if any replicate contains only zero residuals
         if (any(apply(data, 2, function(x) {all(x == 0)}))) {
             # if all residuals are close to zero stop selection procedure
-            if (verbose == TRUE){
+            if (verbose){
                 message(
                     "Stopping selection procedure with k=",
                     k - 1,
-                    " features because remaining features are linear combinations
-                    of already selected features!"
+                    " features because remaining features are linear 
+                    combinations of already selected features!"
                 )
             }
             break
@@ -150,14 +155,13 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbos
         S[, k] <- data[, I, drop = FALSE]
         # drop selected feature from data
         data <- data[, dimnames(data)[[2]]!= I, drop = FALSE]
-        if (verbose == TRUE){
+        if (verbose){
             message("Iteration: ", k, " selected = ", res$selected[k],
                     ", replicate F-statistic = ", res$metric[k])
         }
         k <- k + 1
-
     }
-    if (verbose == TRUE){
+    if (verbose){
         message("Finished feature ranking procedure!")
         message("Calculating explained variance of selected feature sets!")
     }
@@ -165,7 +169,10 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbos
     res$explained_variance <- vapply(seq_along(res$selected), function(i){
         variance_explained(data0, res$selected[seq_len(i)])
     }, numeric(1))
-    se_res <- SummarizedExperiment(assays=list(selected=t(data0[, res$selected])), rowData=res)
+    se_res <- SummarizedExperiment(
+                assays=list(selected=t(data0[, res$selected, drop=FALSE])), 
+                rowData=res
+                )
     se_res
 }
 
@@ -173,7 +180,8 @@ FeatSeek <- function(data, replicates=NULL, max_features=NULL, init=NULL, verbos
 
 #' @title calcFstat
 #'
-#' @param data 2 dimensional \code{array} with samples x features, where each sample
+#' @param data 2 dimensional \code{array} with samples x features, 
+#' where each sample
 #' belongs to a different replicate
 #' @param reps \code{numeric vector} of length samples,
 #' indicating which sample belongs to which replicate

@@ -15,27 +15,26 @@ variance_explained <- function(data, selected){
         is.character(selected),
         length(selected) <= ncol(data)
     )
-    # calculate the fraction of variance explained by the selected feature set for each remaining feature.
+    # calculate the fraction of variance explained by the selected feature set 
+    # for each remaining feature.
     rest <- data
-    data_sel <- data[, selected]
+    data_sel <- data[, selected, drop=FALSE]
     # model remaining features by selected features
     model <- lm(rest ~ data_sel + 0)
     # model holds a fit for each remaining feature
     # catch warning that fit is perfect, as this is expected at certain number
     # of selected features
     s <- withCallingHandlers(summary(model),
-                            warning = function(w){
-                                if(startsWith(conditionMessage(w), "essentially perfect fit")){
-                                    invokeRestart("muffleWarning")
-                                } else {
-                                    message(w$message)
-                                }
-                            })
+            warning = function(w){
+                if(startsWith(conditionMessage(w), "essentially perfect fit")){
+                    invokeRestart("muffleWarning")
+                } else {
+                    message(w$message)
+                }
+            })
     r <- mean(vapply(s, function(x){
         x$r.squared
     }, numeric(1)))
-
     r
-
 }
 

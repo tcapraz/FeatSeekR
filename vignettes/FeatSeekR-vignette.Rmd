@@ -1,9 +1,9 @@
 ---
 title: "`FeatSeekR` user guide"
 author: 
-- name: Tuemay Capraz
-  affiliation: European Molecular Biology Laboratory, Heidelberg
-  email: tuemay.capraz@embl.de
+-   name: Tuemay Capraz
+    affiliation: European Molecular Biology Laboratory, Heidelberg
+    email: tuemay.capraz@embl.de
 package: FeatSeekR
 date: "`r Sys.Date()`"
 output:  
@@ -35,8 +35,8 @@ and modularity.
 Here, we introduce the `FeatSeekR` algorithm, which selects features based on 
 the consistency of their signal across replicates and their non-redundancy.
 It takes a 2 dimensional array (features x samples) of replicated measurements
-and returns a `SummarizedExperiment` object storing the selected features ranked by 
-reproducibility.
+and returns a `SummarizedExperiment` object storing the selected features 
+ranked by reproducibility.
 
 # Installation
 
@@ -67,14 +67,16 @@ replicates <- 3
 # we simulate 500 independent samples per replicate. setting samples=500 and 
 # replicates=3 will generate 1500 samples, leading to final dimensions of
 # 50 features x 1500 samples
-sim <- FeatSeekR::simData(samples=samples, n_latent_factors=latent_factors,
+sim <- simData(samples=samples, n_latent_factors=latent_factors,
                 replicates=replicates)
 
 # show that simulated data dimensions are indeed 50 x 1500 
-dim(SummarizedExperiment::assay(sim, "data"))
+dim(assay(sim, "data"))
 
 # calculate the feature correlation for first replicate
-cor <- stats::cor(t(SummarizedExperiment::assay(sim, "data"))[sim$replicates==1, ], use = "pairwise.complete.obs")
+data <- t(assay(sim, "data"))
+rep1 <- data[sim$replicates==1, , drop=FALSE]
+cor <- cor(rep1, use = "pairwise.complete.obs")
 
 # plot a heatmap of the features and color features according to their 
 # generating latent factors
@@ -84,7 +86,7 @@ colors        <- c("red", "blue", "darkorange", "darkgreen", "black")
 names(colors) <- c("1", "2", "3", "4", "5")
 anno_colors <- list(Latent_factor = colors)
 range <- max(abs(cor))
-pheatmap::pheatmap(cor, treeheight_row = 0 , treeheight_col = 0, 
+pheatmap(cor, treeheight_row = 0 , treeheight_col = 0, 
         show_rownames = FALSE, show_colnames = FALSE,
         breaks = seq(-range, range, length.out = 100), cellwidth = 6, 
         cellheight = 6, annotation_col = anno, annotation_colors = anno_colors, 
@@ -102,12 +104,13 @@ reproducibility.
 res <- FeatSeek(sim, max_features=5)
 
 # plot a heatmap of the top 5 selected features 
-FeatSeekR::plotSelectedFeatures(res)
+plotSelectedFeatures(res)
 ```
 We again visualize the selected features by plotting their correlation matrix.
-As expected, the top 5 selected features are each from a different latent factor 
-and low correlated. This suggests that we were able to obtain a compressed 
-version of the data, while keeping most of the contained information.
+As expected, the top 5 selected features are each from a different latent 
+factor and low correlated. This suggests that we were able to obtain a 
+compressed version of the data, while keeping most of the contained 
+information.
 
 # Selecting image features from the `DmelSGI` package
 
@@ -139,10 +142,10 @@ structure of the features.
 
 ```{r plot data}
 # calculate correlation matrix of the first 50 features of one of the replicates
-cor_mat <- cor(data[reps == 1, 1:50])
+cor_mat <- cor(data[reps == 1, 1:50, drop=FALSE])
 
 # plot correlation matrix, omitting featurenames
-pheatmap::pheatmap(cor_mat, show_rownames=FALSE, show_colnames=FALSE,
+pheatmap(cor_mat, show_rownames=FALSE, show_colnames=FALSE,
     treeheight_row=0, treeheight_col=0)
 ```
 
@@ -157,10 +160,10 @@ replicate consistency.
 # run FeatSeekR and rank up to 20 features based on their replicate 
 # reproducibility and uniqueness
 max_features <- 20
-res <- FeatSeekR::FeatSeek(t(data), 
-                           replicates=reps, 
-                           max_features=max_features,
-                           verbose=TRUE)
+res <- FeatSeek(t(data), 
+        replicates=reps, 
+        max_features=max_features,
+        verbose=TRUE)
 ```
 
 In order determine the ideal number of selected features we can have a look at 
@@ -169,7 +172,7 @@ the fraction of explained variance per additionally selected feature.
 ```{r inspect_selection}
 # plotVarianceExplained plots the fraction of explained variance per 
 # additionally selected feature, ranked by FeatSeek.
-FeatSeekR::plotVarianceExplained(res)
+plotVarianceExplained(res)
 ```
 
 The increase in explained variance seems to flatten out at around 70%.
@@ -181,7 +184,7 @@ total variance and plot their correlation matrix.
 n_feat <- min(which(rowData(res)$explained_variance > 0.7))
 
 # plot the top n_feat features based on the ranking by FeatSeek
-FeatSeekR::plotSelectedFeatures(res, n_features=n_feat)
+plotSelectedFeatures(res, n_features=n_feat)
 ```
 
 The low correlation between the top selected features confirm their low 

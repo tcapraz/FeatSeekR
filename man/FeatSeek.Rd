@@ -13,13 +13,15 @@ FeatSeek(
 )
 }
 \arguments{
-\item{data}{\code{SummarizedExperiment} with assay named \code{data}, where each sample
+\item{data}{\code{SummarizedExperiment} with assay named \code{data}, 
+where each sample
 belongs to a different replicate. Which sample belongs to which replicate
-should indicated in \code{colData} slot replicates. Or \code{matrix} with features x samples.}
+should indicated in \code{colData} slot replicates. Or \code{matrix} 
+with features x samples.}
 
 \item{replicates}{numeric vector of length samples,
-indicating which sample belongs to which replicate. Only required if \code{data} is
-provided as \code{matrix}.}
+indicating which sample belongs to which replicate. Only required if 
+\code{data} is provided as \code{matrix}.}
 
 \item{max_features}{\code{integer} number of features to rank}
 
@@ -29,8 +31,9 @@ If \code{NULL} the feature with highest F-statistic will be used}
 \item{verbose}{\code{logical} indicating whether messages should be printed}
 }
 \value{
-\code{SummarizedExperiment} containing one assay with the selected features.
-\code{rowData} stores for each selected feature the F-statistic under \code{metric},
+\code{SummarizedExperiment} containing one assay with the 
+selected features. \code{rowData} stores for each selected feature the 
+F-statistic under \code{metric},
 the cumulative explained variance under \code{explained_variance} and
 the feature names under \code{selected}
 }
@@ -40,11 +43,12 @@ dimensional array according to their reproducibility between replicates.
 }
 \examples{
 # run FeatSeek to select the top 20 features
-data <-  array(rnorm(100*30), dim=c(30,100),
+data <-  array(rnorm(100*30), dim=c(30, 100),
 dimnames <- list(paste("feature", seq_len(30)), NULL))
-reps <- rep(c(1,2), each=50)
+reps <- rep(c(1, 2), each=50)
 res <- FeatSeek(data, reps, max_features=20)
 
-# res stores the 20 selected features ranked by their replicate reproducibility
+# res stores the 20 selected features ranked by their replicate 
+# reproducibility
 
 }

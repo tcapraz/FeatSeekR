@@ -1,37 +1,50 @@
 #' @title check_input
 #'
-#' @description Checks input \code{data}. Input \code{data} should be a 2 dimensional \code{array}
-#' with samples x features or \code{SummarizedExperiment} carrying one assay named \code{data}
-#' and \code{colData} indicating which sample belongs to which replicate
+#' @description Checks input \code{data}. 
+#' Input \code{data} should be a 2 dimensional \code{array}
+#' with samples x features or \code{SummarizedExperiment} carrying one assay 
+#' named \code{data} and \code{colData} indicating which sample belongs 
+#' to which replicate
 #'
 #'
-#' @param data input \code{data} provided to \code{FeatSeek} either \code{SummarizedExperiment} or
+#' @param data input \code{data} provided to \code{FeatSeek} either 
+#' \code{SummarizedExperiment} or
 #' 2 dimensional \code{array} with features x samples
-#' @param replicates if \code{data} is a 2 dimensional \code{array} with features x samples
+#' @param replicates if \code{data} is a 2 dimensional \code{array} 
+#' with features x samples
 #' a vector indicating which sample corresponds to which replicate
 #' must be provided
 #'
 #'
-#' @return \code{SummarizedExperiment} where replicate information is stored in colData
+#' @return \code{SummarizedExperiment} where replicate information is stored in 
+#' colData
 #' 
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
 #' @keywords internal
 check_input <- function(data, max_features, replicates=NULL){
     if (!is(data,"SummarizedExperiment")){
         reps <- data.frame(replicates=replicates)
-        if (!length(replicates) == ncol(data)) stop("Replicate indicator vector not same length as samples in data!")
+        if (!length(replicates) == ncol(data)) 
+            stop(strwrap(
+                "Replicate indicator vector not same length as samples in 
+                data!")
+            )
         se <- SummarizedExperiment(assays=list(data=data), colData=reps)
     } else {
         se <- data
     }
     fnames <- rownames(se)
-    if (all(vapply(fnames, function(x) is.null(x), logical(1)))) stop(
-        "No feature names given or features not in correct dimension of data array!")
-
-    if (!is.null(max_features) & max_features > nrow(se)) stop("Max features higher than features in data!")
-
-    if( length(unique(se$replicates)) < 2) stop("At least 2 replicates required!")
-    if (any(table(se$replicates) < 2)) stop("Not every sample has at least 2 replicates!")
+    if (all(vapply(fnames, function(x) is.null(x), logical(1)))) 
+        stop(strwrap(prefix = " ", initial = "",
+            "No feature names given or features not in correct dimension of 
+            data array!")
+        )
+    if (!is.null(max_features) & max_features > nrow(se)) 
+        stop("Max features higher than features in data!")
+    if( length(unique(se$replicates)) < 2) 
+        stop("At least 2 replicates required!")
+    if (any(table(se$replicates) < 2)) 
+        stop("Not every sample has at least 2 replicates!")
     se
 }
 
@@ -61,7 +74,11 @@ init_selected <- function(init, se){
     )
     features <- dimnames(assay(se, "data"))[[1]]
     replicates <- se$replicates
-    if (is.null(features)) stop("No feature names given or features not in correct dimension of data array!")
+    if (is.null(features)) 
+        stop(strwrap(prefix = " ", initial = "",
+            "No feature names given or features not in correct dimension of 
+            data array!")
+        )
     # check if init features are in data
     if(!is.null(init) & !all(init %in% features)){
         stop("Could not find init features in data!")
@@ -74,14 +91,14 @@ init_selected <- function(init, se){
         f <- vapply(seq_len(dim(data)[[2]]), function(x){
             m <- lm(replicates ~ data[, x])
             s <- withCallingHandlers(summary(m),
-                                warning = function(w){
-                                    if(startsWith(conditionMessage(w),
-                                        "essentially perfect fit")){
-                                        invokeRestart("muffleWarning")
-                                    } else {
-                                        message(w$message)
-                                    }
-                                })
+                    warning = function(w){
+                        if(startsWith(conditionMessage(w),
+                            "essentially perfect fit")){
+                            invokeRestart("muffleWarning")
+                        } else {
+                            message(w$message)
+                        }
+                    })
             s$fstatistic[1]
         }, numeric(1))
         names(f) <-  features

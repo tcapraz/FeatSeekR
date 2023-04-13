@@ -12,7 +12,8 @@
 #' reps <- rep(c(1,2), each=50)
 #' res <- FeatSeek(data, reps, max_features=20)
 #'
-#' # res stores the 20 selected features ranked by their replicate reproducibility
+#' # res stores the 20 selected features ranked by their replicate 
+#' # reproducibility
 #' plotVarianceExplained(res)
 #'
 #' @importFrom SummarizedExperiment rowData
@@ -23,7 +24,10 @@ plotVarianceExplained <- function(res){
         is(res, "SummarizedExperiment")
     )
     if (is.null(rowData(res)$explained_variance)){
-        stop("'res' does not contain attribute explained_variance. Please run FeatSeek first!")
+        stop(strwrap(prefix = " ", initial = "",
+            "'res' does not contain attribute explained_variance.
+            Please run FeatSeek first!")
+        )
     }
 
     plot(seq_len(nrow(res)), rowData(res)$explained_variance,
@@ -38,10 +42,10 @@ plotVarianceExplained <- function(res){
 #' @description plot correlation matrix of selected feature sets
 #'
 #' @param res result \code{SummarizedExperiment} from \code{FeatSeek} function
-#' @param n_features top \code{n_features} to plot. if \code{NULL} then the maximum number
-#'  of features in res will be plotted
-#' @param assay assay slot to plot from result \code{SummarizedExperiment} object, 
-#'  default is the selected features slot
+#' @param n_features top \code{n_features} to plot. if \code{NULL} then the 
+#' maximum number of features in res will be plotted
+#' @param assay assay slot to plot from result \code{SummarizedExperiment} 
+#' object, default is the selected features slot
 #'
 #' @return returns heatmap of selected features
 #'
@@ -52,7 +56,8 @@ plotVarianceExplained <- function(res){
 #' reps <- rep(c(1,2), each=50)
 #' res <- FeatSeek(data, reps, max_features=20)
 #'
-#' # res stores the 20 selected features ranked by their replicate reproducibility
+#' # res stores the 20 selected features ranked by their replicate 
+#' # reproducibility
 #' # plot the top 5 features
 #' plotSelectedFeatures(res, n_features=5)
 #' 
@@ -81,8 +86,11 @@ plotSelectedFeatures <- function(res, n_features=NULL, assay="selected"){
             round(n_features) == n_features
         )
     }
-    cor <- cor(t(assay(res, assay))[, seq_len(n_features)], use = "pairwise.complete.obs")
-
+    # get selected top n_features
+    data <- t(assay(res, assay))
+    sel <- data[, seq_len(n_features), drop=FALSE]
+    # calculate correlation and plot correlation matrix
+    cor <- cor(sel, use = "pairwise.complete.obs")
     range <- max(abs(cor))
     pheatmap(cor, treeheight_row=0, treeheight_col = 0, legend=TRUE,
                     show_colnames=FALSE, show_rownames=TRUE,

@@ -14,7 +14,8 @@
 #' simData constructs n_latent_factors by generating a random matrix
 #' \eqn{\mathbf{Q}} whose row vectors
 #' \eqn{\mathbf{Q}_{i\cdot}  \sim \mathcal{N}(0,1)}
-#' with \eqn{n} samples and \eqn{i \in \{1, \dots, \textrm{n\_latent\_factors}\}} are
+#' with \eqn{n} samples and \eqn{i \in \{1, \dots, 
+#' \textrm{n\_latent\_factors}\}} are
 #' orthonormal, each corresponding to a different latent factor. To simulate a
 #' set of redundant feature groups, it generates 10 features \eqn{X_{j\cdot}}
 #' for each latent factor \eqn{\mathbf{Q}_{i\cdot}} by scaling each latent
@@ -51,7 +52,6 @@ simData <- function(samples, n_latent_factors, replicates) {
         length(samples) == 1,
         length(replicates) == 1
     )
-    
     # total number of features
     p <- n_latent_factors * 10
     # total number of measurements
@@ -96,10 +96,15 @@ simData <- function(samples, n_latent_factors, replicates) {
     }
     # combine replicates
     data <- Reduce(function(x, y) rbind(x, y), replist)
-
     featnames <- c()
     for(i in seq_len(n_latent_factors)){
-        featnames <- c(featnames, paste0("Latent_factor", i, "_Feature", seq_len(10)))
+        featnames <- c(featnames, 
+                        paste0(
+                            "Latent_factor", 
+                            i, 
+                            "_Feature", 
+                            seq_len(10))
+                        )
     }
     dimnames(data)[[2]] <-  featnames
     reps <- data.frame(replicates=rep(seq_len(replicates), each=samples))

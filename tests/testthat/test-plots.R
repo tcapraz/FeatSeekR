@@ -35,7 +35,8 @@ test_that("plotVarianceExplained returns plot",{
    
     expect_true(is.null(plotVarianceExplained(se_res)))
     expect_error(plotVarianceExplained(data))
-    expect_error(plotVarianceExplained(se), "'res' does not contain attribute explained_variance. Please run FeatSeek first!")
+    expect_error(plotVarianceExplained(se), "'res' does not contain attribute explained_variance.  Please run FeatSeek first!")
+    
     
 })
   

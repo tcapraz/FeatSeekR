@@ -7,7 +7,8 @@
 calcFstat(data, reps, scale = TRUE)
 }
 \arguments{
-\item{data}{2 dimensional \code{array} with samples x features, where each sample
+\item{data}{2 dimensional \code{array} with samples x features, 
+where each sample
 belongs to a different replicate}
 
 \item{reps}{\code{numeric vector} of length samples,

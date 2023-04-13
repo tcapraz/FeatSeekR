@@ -22,7 +22,8 @@ data <-  array(rnorm(100*30), dim=c(30,100),
 reps <- rep(c(1,2), each=50)
 res <- FeatSeek(data, reps, max_features=20)
 
-# res stores the 20 selected features ranked by their replicate reproducibility
+# res stores the 20 selected features ranked by their replicate 
+# reproducibility
 plotVarianceExplained(res)
 
 }
