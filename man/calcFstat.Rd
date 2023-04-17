@@ -8,26 +8,17 @@ calcFstat(data, fac)
 }
 \arguments{
 \item{data}{2 dimensional \code{array} with samples x features, 
-where each sample
-belongs to a different replicate. The function was adapted from the
+where samples
+belongs different conditions. The function was adapted from the
 \code{genefilter} package.}
 
 \item{fac}{\code{factor} of length samples,
 indicating which sample belongs to which condition}
-
-\item{reps}{\code{numeric vector} of length samples,
-indicating which sample belongs to which replicate}
-
-\item{scale}{\code{logical} whether to scale the data, default = TRUE}
 }
 \value{
 F-statistic for all features
-
-F-statistic for all features
 }
 \description{
-calcFstat
-
 calcFstat
 }
 \keyword{internal}

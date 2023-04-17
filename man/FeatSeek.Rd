@@ -14,8 +14,8 @@ FeatSeek(
 }
 \arguments{
 \item{data}{\code{SummarizedExperiment} with assay named \code{data}, 
-where each sample
-belongs to a different condition. Which sample belongs to which condition
+where samples
+belongs to different conditions. Which sample belongs to which condition
 should be indicated in \code{colData} slot conditions. 
 Or \code{matrix} with features x samples.
 Each conditions have multiple samples from replicated measurements.}
