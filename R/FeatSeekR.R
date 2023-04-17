@@ -229,7 +229,7 @@ calcFstat <- function(data, fac){
     all_m <- matrix(rowMeans(data), ncol=ncol(data), nrow=nrow(data))
     
     # degree of freedom 2
-    dfr    <- ncol(data) - dff
+    dfr    <- ncol(data) - k
     
     # mean sum of squares
     mssf   <- rowSums((all_m - group_m)^2) / dff
