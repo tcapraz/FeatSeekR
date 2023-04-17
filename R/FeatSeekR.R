@@ -210,7 +210,7 @@ calcFstat <- function(data, fac){
     # Number of levels (groups)
     k <- nlevels(fac)
     
-    # data_m: a ncol(data) x nlevels(fac) matrix with the means of each 
+    # group_m: a ncol(data) x nlevels(fac) matrix with the means of each 
     # condition
     group_m <- matrix(
         vapply(levels(fac), function(fl) 
@@ -218,7 +218,7 @@ calcFstat <- function(data, fac){
         nrow = nrow(data),
         ncol = nlevels(fac))
     
-    # data_gm: a matrix of condition means, with as many rows as data, 
+    # group_gm: a matrix of condition means, with as many rows as data, 
     # columns correspond to conditions
     group_m <- group_m[, fac, drop=FALSE]
     
