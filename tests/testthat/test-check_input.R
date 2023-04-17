@@ -6,22 +6,22 @@ test_that("check_input returns appropriate error messages", {
     data_no_names <- array(c(1,2,3), dim=c(3,6))
     data_wrong_names <-  array(c(1,2,3), dim=c(3,6),
                 dimnames=list(c("fir", "sec", "th"), NULL))
-    reps <- rep(c(1,2), each=3)
-    wrong_reps <- rep(c(1,2), each=6)
-    rep1 <- rep(1, 6)
-    rep12 <- rep1
-    rep12[1] <- 2
-    long_reps <- rep(c(1,2), each=10)
+    conds <- rep(seq_len(3), 2)
+    wrong_conds <- rep(seq_len(6), 2)
+    cond1 <- rep(1, 6)
+    cond12 <- cond1
+    cond12[1] <- 2
+    long_conds <- rep(c(1,2), each=10)
     
-    expect_error(check_input(data_no_names, reps, max_features = 2), "No feature names given or features not in correct dimension of data array!")
-    expect_error(check_input(data, reps, max_features = 20), "Max features higher than features in data!")
-    expect_error(check_input(data, rep1, max_features = 2), "At least 2 replicates required!")
-    expect_error(check_input(data, rep12, max_features = 2), "Not every sample has at least 2 replicates!")
-    expect_error(check_input(data, long_reps, max_features=2), "Replicate indicator vector not same length as samples in data!")
-    expect_true(is(check_input(data, reps, max_features = 2), "SummarizedExperiment"))
+    expect_error(check_input(data_no_names, conds, max_features = 2), "No feature names given or features not in correct dimension of data array!")
+    expect_error(check_input(data, conds, max_features = 20), "Max features higher than features in data!")
+    expect_error(check_input(data, cond1, max_features = 2), "At least 2 conditions required!")
+    expect_error(check_input(data, cond12, max_features = 2), "Not every condition has at least 2 replicates!")
+    expect_error(check_input(data, long_conds, max_features=2), "Condition factor not same length as samples in data!")
+    expect_true(is(check_input(data, conds, max_features = 2), "SummarizedExperiment"))
     
-    se <- check_input(data, reps, max_features = 2)
-    expect_true(all(se$replicates == reps))
+    se <- check_input(data, conds, max_features = 2)
+    expect_true(all(se$conditions == conds))
     expect_true(all(rownames(se) == c("first", "second", "third")))
 
 })
@@ -34,16 +34,16 @@ test_that("init returns feature with highest F-statistic or issues warning if in
     data_no_names <- array(c(1,2,3), dim=c(3,6))
     data_wrong_names <-  array(c(1,2,3), dim=c(3,6),
                 dimnames=list(c("fir", "sec", "th"), NULL))
-    reps <- data.frame(replicates=rep(c(1,2), each=3))
+    conds <- data.frame(conditions=as.factor(rep(seq_len(3), 2)))
     se <- SummarizedExperiment::SummarizedExperiment(
       assays=list(data=data),
-      colData=reps)
+      colData=conds)
     se_no_names <- SummarizedExperiment::SummarizedExperiment(
       assays=list(data=data_no_names),
-      colData=reps)
+      colData=conds)
     se_wrong_names <- SummarizedExperiment::SummarizedExperiment(
       assays=list(data=data_wrong_names),
-      colData=reps)
+      colData=conds)
 
     init <- "first"
     expected_init <- "third"

@@ -4,27 +4,27 @@
 \alias{check_input}
 \title{check_input}
 \usage{
-check_input(data, max_features, replicates = NULL)
+check_input(data, max_features, conditions = NULL)
 }
 \arguments{
 \item{data}{input \code{data} provided to \code{FeatSeek} either 
 \code{SummarizedExperiment} or
 2 dimensional \code{array} with features x samples}
 
-\item{replicates}{if \code{data} is a 2 dimensional \code{array} 
+\item{conditions}{if \code{data} is a 2 dimensional \code{array} 
 with features x samples
-a vector indicating which sample corresponds to which replicate
+a factor indicating which sample corresponds to which condition
 must be provided}
 }
 \value{
-\code{SummarizedExperiment} where replicate information is stored in 
+\code{SummarizedExperiment} where condition information is stored in 
 colData
 }
 \description{
 Checks input \code{data}. 
 Input \code{data} should be a 2 dimensional \code{array}
-with samples x features or \code{SummarizedExperiment} carrying one assay 
+with features x samples or \code{SummarizedExperiment} carrying one assay 
 named \code{data} and \code{colData} indicating which sample belongs 
-to which replicate
+to which condition
 }
 \keyword{internal}

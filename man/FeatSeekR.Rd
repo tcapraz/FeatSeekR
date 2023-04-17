@@ -7,7 +7,7 @@
 \description{
 FeatSeekR performs unsupervised feature selection using replicated 
 measurements. It iteratively selects features with the highest 
-reproducibility across replicates, after projecting out those dimensions 
+reproducibility across conditions, after projecting out those dimensions 
 from the data that are spanned by the previously selected features. The 
 selected a set of features has a high replicate reproducibility and a high 
 degree of uniqueness.

@@ -2,34 +2,34 @@
 #'
 #' @description Checks input \code{data}. 
 #' Input \code{data} should be a 2 dimensional \code{array}
-#' with samples x features or \code{SummarizedExperiment} carrying one assay 
+#' with features x samples or \code{SummarizedExperiment} carrying one assay 
 #' named \code{data} and \code{colData} indicating which sample belongs 
-#' to which replicate
+#' to which condition
 #'
 #'
 #' @param data input \code{data} provided to \code{FeatSeek} either 
 #' \code{SummarizedExperiment} or
 #' 2 dimensional \code{array} with features x samples
-#' @param replicates if \code{data} is a 2 dimensional \code{array} 
+#' @param conditions if \code{data} is a 2 dimensional \code{array} 
 #' with features x samples
-#' a vector indicating which sample corresponds to which replicate
+#' a factor indicating which sample corresponds to which condition
 #' must be provided
 #'
 #'
-#' @return \code{SummarizedExperiment} where replicate information is stored in 
+#' @return \code{SummarizedExperiment} where condition information is stored in 
 #' colData
 #' 
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
 #' @keywords internal
-check_input <- function(data, max_features, replicates=NULL){
+check_input <- function(data, max_features, conditions=NULL){
     if (!is(data,"SummarizedExperiment")){
-        reps <- data.frame(replicates=replicates)
-        if (!length(replicates) == ncol(data)) 
+        cond<- data.frame(conditions=as.factor(conditions))
+        if (!length(cond$conditions) == ncol(data)) 
             stop(strwrap(
-                "Replicate indicator vector not same length as samples in 
+                "Condition factor not same length as samples in 
                 data!")
             )
-        se <- SummarizedExperiment(assays=list(data=data), colData=reps)
+        se <- SummarizedExperiment(assays=list(data=data), colData=cond)
     } else {
         se <- data
     }
@@ -41,17 +41,17 @@ check_input <- function(data, max_features, replicates=NULL){
         )
     if (!is.null(max_features) & max_features > nrow(se)) 
         stop("Max features higher than features in data!")
-    if( length(unique(se$replicates)) < 2) 
-        stop("At least 2 replicates required!")
-    if (any(table(se$replicates) < 2)) 
-        stop("Not every sample has at least 2 replicates!")
+    if( length(unique(se$conditions)) < 2) 
+        stop("At least 2 conditions required!")
+    if (any(table(se$conditions) < 2)) 
+        stop("Not every condition has at least 2 replicates!")
     se
 }
 
 #' @title init_selected
 #'
 #' @description Checks if preselected init features are in input data.
-#' If init is NULL, it is set to feature with highest replicate correlation.
+#' If init is NULL, it is set to feature with highest condition correlation.
 #'
 #' @param init preselected starting set of features
 #' @param data input data as SummarizedExperiment
@@ -73,7 +73,7 @@ init_selected <- function(init, se){
         is.character(init) | is.null(init)
     )
     features <- dimnames(assay(se, "data"))[[1]]
-    replicates <- se$replicates
+    conditions <- se$conditions
     if (is.null(features)) 
         stop(strwrap(prefix = " ", initial = "",
             "No feature names given or features not in correct dimension of 
@@ -84,25 +84,13 @@ init_selected <- function(init, se){
         stop("Could not find init features in data!")
     }
 
-    # start with feature with highest replicate correlation if no init
+    # start with feature with highest condition correlation if no init
     # features were given
     if (is.null(init)){
-        data <- t(data.frame(assay(se, "data")))
-        f <- vapply(seq_len(dim(data)[[2]]), function(x){
-            m <- lm(replicates ~ data[, x])
-            s <- withCallingHandlers(summary(m),
-                    warning = function(w){
-                        if(startsWith(conditionMessage(w),
-                            "essentially perfect fit")){
-                            invokeRestart("muffleWarning")
-                        } else {
-                            message(w$message)
-                        }
-                    })
-            s$fstatistic[1]
-        }, numeric(1))
+        data <- t(assay(se, "data"))
+        f <- calcFstat(data, se$conditions)
         names(f) <-  features
-        init <- names(which.min(f))
+        init <- names(which.max(f))
     }
     init
 }

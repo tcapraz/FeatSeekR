@@ -4,7 +4,7 @@
 #' 
 #' FeatSeekR performs unsupervised feature selection using replicated 
 #' measurements. It iteratively selects features with the highest 
-#' reproducibility across replicates, after projecting out those dimensions 
+#' reproducibility across conditions, after projecting out those dimensions 
 #' from the data that are spanned by the previously selected features. The 
 #' selected a set of features has a high replicate reproducibility and a high 
 #' degree of uniqueness.
@@ -29,18 +29,19 @@ NULL
 
 #' @title FeatSeek
 #' @description This function ranks features of a 2
-#' dimensional array according to their reproducibility between replicates.
+#' dimensional array according to their reproducibility between conditions.
 #'
 #'
 #' 
 #' @param data \code{SummarizedExperiment} with assay named \code{data}, 
-#' where each sample
-#' belongs to a different replicate. Which sample belongs to which replicate
-#' should indicated in \code{colData} slot replicates. Or \code{matrix} 
-#' with features x samples.
+#' where samples
+#' belongs to different conditions. Which sample belongs to which condition
+#' should be indicated in \code{colData} slot conditions. 
+#' Or \code{matrix} with features x samples.
+#' Each conditions have multiple samples from replicated measurements.
 #'
-#' @param replicates numeric vector of length samples,
-#' indicating which sample belongs to which replicate. Only required if 
+#' @param conditions factor of length samples,
+#' indicating which sample belongs to which condition. Only required if 
 #' \code{data} is provided as \code{matrix}.
 #' @param init \code{character vector} with names of initial features.
 #' If \code{NULL} the feature with highest F-statistic will be used
@@ -57,8 +58,8 @@ NULL
 #' # run FeatSeek to select the top 20 features
 #' data <-  array(rnorm(100*30), dim=c(30, 100),
 #' dimnames <- list(paste("feature", seq_len(30)), NULL))
-#' reps <- rep(c(1, 2), each=50)
-#' res <- FeatSeek(data, reps, max_features=20)
+#' conds <- rep(seq_len(50), 2)
+#' res <- FeatSeek(data, conds, max_features=20)
 #'
 #' # res stores the 20 selected features ranked by their replicate 
 #' # reproducibility
@@ -69,29 +70,31 @@ NULL
 #' @export
 FeatSeek <- function(
     data, 
-    replicates=NULL, 
+    conditions=NULL, 
     max_features=NULL, 
     init=NULL, 
     verbose=TRUE) {
     stopifnot(
-        is.numeric(replicates) | is.null(replicates),
+        is.numeric(conditions) | is.null(conditions),
         is.numeric(max_features) | is.null(max_features),
         is.character(init) | is.null(init),
         is.logical(verbose)
     )
-    se <- check_input(data, max_features, replicates)
+    se <- check_input(data, max_features, conditions)
 
     p <- nrow(se)
     n <- ncol(se)
-    r <- length(unique(se$replicates))
+    c <- length(unique(se$conditions))
+    r <- n/c
 
     # initialize starting set of features
     init <- init_selected(init, se)
     if (verbose){
         message("Input data has: \n",
                 n, " samples \n",
-                r, " replicates \n",
-                p, " features")
+                c, " conditions \n",
+                p, " features \n",
+                r, " replicates")
     }
     # init max_features
     if(is.null(max_features)){
@@ -111,11 +114,11 @@ FeatSeek <- function(
     S <- array(NA, dim=c(n, p))
     k <- 1
     data <- t(assay(se, "data"))
-    replicates <- se$replicates
+    conditions <- se$conditions
     data0 <- data
     # start ranking features
     # in each iteration we select the feature with
-    # highest consistency between replicates
+    # highest consistency between conditions
     # after projecting out the previously selected ones
     if (verbose){
         message("Starting feature ranking!")
@@ -137,13 +140,13 @@ FeatSeek <- function(
             }
             break
         }
-        # calculate mean pairwise correlations between all replicates
-        metric <- calcFstat(data, replicates)
+        # calculate mean pairwise correlations between all conditions
+        metric <- calcFstat(data, conditions)
         metric_all[[k]] <- metric
         names(metric) <- dimnames(data)[[2]]
         if (k > length(init)) {
             # select feature whose residuals have the highest correlation
-            I <- names(metric)[which.min(metric)]
+            I <- names(metric)[which.max(metric)]
         } else{
             # first features are set to init ones
             I <- init[k]
@@ -178,33 +181,61 @@ FeatSeek <- function(
 
 
 
+
 #' @title calcFstat
 #'
 #' @param data 2 dimensional \code{array} with samples x features, 
-#' where each sample
-#' belongs to a different replicate
-#' @param reps \code{numeric vector} of length samples,
-#' indicating which sample belongs to which replicate
-#' @param scale \code{logical} whether to scale the data, default = TRUE
-#'
+#' where samples
+#' belongs different conditions. The function was adapted from the
+#' \code{genefilter} package.
+#' @param fac \code{factor} of length samples,
+#' indicating which sample belongs to which condition
+#' 
 #' @return F-statistic for all features
 #'
-#' @importFrom stats lm
 #' @importFrom methods is
 #' 
 #' @keywords internal
-calcFstat <- function(data, reps, scale=TRUE){
+calcFstat <- function(data, fac){
     stopifnot(
-        is.numeric(data),
-        is.numeric(reps),
-        length(reps) == nrow(data),
-        is.logical(scale)
+        length(fac)==nrow(data), 
+        is.factor(fac), 
+        is.matrix(data)
     )
     data <- scale(data)
-    f <- vapply(seq_len(dim(data)[2]), function(x){
-        m <- lm(data[,x] ~ as.factor(reps))
-        s <- summary(m)
-        f <- s$fstatistic[1]
-        }, numeric(1))
-    f
+    data <- t(data)
+    data   <- data[, !is.na(fac), drop=FALSE]
+    fac <- fac[!is.na(fac)]
+    
+    # Number of levels (groups)
+    k <- nlevels(fac)
+    
+    # data_m: a ncol(data) x nlevels(fac) matrix with the means of each 
+    # condition
+    group_m <- matrix(
+        vapply(levels(fac), function(fl) 
+            rowMeans(data[, which(fac==fl), drop=FALSE]), numeric(nrow(data))),
+        nrow = nrow(data),
+        ncol = nlevels(fac))
+    
+    # data_gm: a matrix of condition means, with as many rows as data, 
+    # columns correspond to conditions
+    group_m <- group_m[, fac, drop=FALSE]
+    
+    # degree of freedom 1
+    dff    <- k - 1
+    
+    # all_m: a matrix of same size as data with overall means
+    all_m <- matrix(rowMeans(data), ncol=ncol(data), nrow=nrow(data))
+    
+    # degree of freedom 2
+    dfr    <- ncol(data) - dff
+    
+    # mean sum of squares
+    mssf   <- rowSums((all_m - group_m)^2) / dff
+    mssr   <- rowSums((data - group_m)^2) / dfr
+    
+    # F statistic
+    fstat  <- mssf/mssr
+    fstat
 }

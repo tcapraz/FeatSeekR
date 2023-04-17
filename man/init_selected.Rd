@@ -16,6 +16,6 @@ names of initial set of feature
 }
 \description{
 Checks if preselected init features are in input data.
-If init is NULL, it is set to feature with highest replicate correlation.
+If init is NULL, it is set to feature with highest condition correlation.
 }
 \keyword{internal}

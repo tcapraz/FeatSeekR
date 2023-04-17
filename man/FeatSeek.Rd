@@ -6,7 +6,7 @@
 \usage{
 FeatSeek(
   data,
-  replicates = NULL,
+  conditions = NULL,
   max_features = NULL,
   init = NULL,
   verbose = TRUE
@@ -15,12 +15,13 @@ FeatSeek(
 \arguments{
 \item{data}{\code{SummarizedExperiment} with assay named \code{data}, 
 where each sample
-belongs to a different replicate. Which sample belongs to which replicate
-should indicated in \code{colData} slot replicates. Or \code{matrix} 
-with features x samples.}
+belongs to a different condition. Which sample belongs to which condition
+should be indicated in \code{colData} slot conditions. 
+Or \code{matrix} with features x samples.
+Each conditions have multiple samples from replicated measurements.}
 
-\item{replicates}{numeric vector of length samples,
-indicating which sample belongs to which replicate. Only required if 
+\item{conditions}{factor of length samples,
+indicating which sample belongs to which condition. Only required if 
 \code{data} is provided as \code{matrix}.}
 
 \item{max_features}{\code{integer} number of features to rank}
@@ -39,14 +40,14 @@ the feature names under \code{selected}
 }
 \description{
 This function ranks features of a 2
-dimensional array according to their reproducibility between replicates.
+dimensional array according to their reproducibility between conditions.
 }
 \examples{
 # run FeatSeek to select the top 20 features
 data <-  array(rnorm(100*30), dim=c(30, 100),
 dimnames <- list(paste("feature", seq_len(30)), NULL))
-reps <- rep(c(1, 2), each=50)
-res <- FeatSeek(data, reps, max_features=20)
+conds <- rep(seq_len(50), 2)
+res <- FeatSeek(data, conds, max_features=20)
 
 # res stores the 20 selected features ranked by their replicate 
 # reproducibility
