@@ -35,8 +35,8 @@ and modularity.
 Here, we introduce the `FeatSeekR` algorithm, which selects features based on 
 the consistency of their signal across replicates and their non-redundancy.
 It takes a 2 dimensional array (features x samples) of replicated measurements
-and returns a `SummarizedExperiment` object storing the selected features 
-ranked by reproducibility.
+and returns a `r Biocpkg("SummarizedExperiment")` object storing the selected 
+features ranked by reproducibility.
 
 # Installation
 
@@ -114,12 +114,13 @@ information.
 # Selecting image features from the `DmelSGI` package
 
 Here we use `FeatSeekR` to rapidly identify unique features with reproducible 
-signal between measurements in an image dataset from the `DmelSGI` package. 
-The authors of `DmelSGI` performed combinatorial gene knock-outs using siRNA, 
+signal between measurements in an image dataset from the `r Biocpkg("DmelSGI")` 
+package. The authors of `r Biocpkg("DmelSGI")` performed combinatorial gene 
+knock-outs using siRNA, 
 followed by imaging of the cells. The resulting images were segmented and 
-features were extracted using the `EBImage` package. Here, conditions refer to 
-different gene knock-outs, features to the extracted image features and 
-replicates to repeated measurements of the individual conditions.
+features were extracted using the `r Biocpkg("EBImage")` package. Here, 
+conditions refer to different gene knock-outs, features to the extracted image 
+features and replicates to repeated measurements of the individual conditions.
 
 
 ```{r, load_data}
