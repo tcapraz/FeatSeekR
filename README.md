@@ -28,23 +28,22 @@ BiocManager::install("FeatSeekR")
 See vignette for more detailed examples.
 
 ```{r}
+library(FeatSeekR)
 set.seed(111)
-# simulate data with 500 samples, 3 replicates and 5 latent factors 
+# simulate data with 500 conditions, 3 replicates (1500 samples) and 5 latent factors 
 # generating 50 features
-samples <- 500
+conditions <- 500
 latent_factors <- 5
 replicates <- 3
 
-sim <- FeatSeekR::simData(samples=samples,latent_factors =latent_factors,
-                replicates = replicates)
-data <- sim[[1]]
-reps <- sim[[2]]
+data <- FeatSeekR::simData(conditions=conditions,n_latent_factors =latent_factors,
+  replicates = replicates)
 
 # select the top 5 features
-res <- FeatSeek(data, replicates =reps, max_features=5)
+res <- FeatSeek(data, max_features=5)
 
 # plot a heatmap of the top 5 selected features 
-FeatSeekR::plotSelectedFeatures(data, res)
+FeatSeekR::plotSelectedFeatures(res)
 ```
 
 
