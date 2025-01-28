@@ -110,6 +110,93 @@ factor and low correlated. This suggests that we were able to obtain a
 compressed version of the data, while keeping most of the contained 
 information.
 
+<<<<<<< HEAD
+=======
+# Selecting image features from the `HD2013SGI` package
+
+Here we use `FeatSeekR` to rapidly identify unique features with reproducible 
+signal between measurements in an image dataset from the `r Biocpkg("HD2013SGI")` 
+package. The authors of `r Biocpkg("HD2013")` performed combinatorial gene 
+knock-outs using siRNA, 
+followed by imaging of the cells. The resulting images were segmented and 
+features were extracted using the `r Biocpkg("EBImage")` package. Here, 
+conditions refer to different gene knock-outs, features to the extracted image 
+features and replicates to repeated measurements of the individual conditions.
+
+
+```{r, load_data}
+# the data in HD2013SGI was processed according to the vignette in HD2013
+data(HD2013SGI)
+
+# remove duplicate features
+hd2013 <- hd2013[,,!duplicated(dimnames(hd2013)[[3]])]
+hd2013 <- aperm(hd2013, c(1,3,2))
+
+
+# bind samples and create condition factor
+conds <- rep(seq_len(dim(hd2013)[1]), 2)
+hd2013 <- rbind(hd2013[,,1], hd2013[,,2])
+
+# show final data dimensions
+dim(hd2013)
+```
+
+The input data has 5820 samples, 216 features and 2
+replicates. Again, we plot the correlation matrix of the data to explore the 
+structure of the features.
+
+```{r plot data}
+# calculate correlation matrix of the first 50 features of one of the replicates
+cor_mat <- cor(hd2013[, 1:50, drop=FALSE])
+
+# plot correlation matrix, omitting featurenames
+pheatmap(cor_mat, show_rownames=FALSE, show_colnames=FALSE,
+    treeheight_row=0, treeheight_col=0)
+```
+
+Analogous to the idealized simulated example, the extracted features formed 
+groups of high correlation within and lower correlation between. This supports 
+the idea that the effective dimension of the data matrix is substantially lower 
+than the number of features and that feature selection is a plausible approach 
+to these data. We apply `FeatSeek` to identify unique features with high 
+replicate consistency.
+
+```{r select_features}
+# run FeatSeekR and rank up to 10 features based on their replicate 
+# reproducibility and uniqueness
+max_features <- 10
+res <- FeatSeek(t(hd2013), 
+        conditions=conds, 
+        max_features=max_features,
+        verbose=TRUE)
+```
+
+In order determine the ideal number of selected features we can have a look at 
+the fraction of explained variance per additionally selected feature.
+
+```{r inspect_selection}
+# plotVarianceExplained plots the fraction of explained variance per 
+# additionally selected feature, ranked by FeatSeek.
+plotVarianceExplained(res)
+```
+
+The increase in explained variance seems to flatten out at around 70%.
+We therefore select the number of features, that explain at least 70% of the 
+total variance and plot their correlation matrix.
+
+```{r plot selection}
+# get number of features which explain at least 70% of the total variance
+n_feat <- min(which(rowData(res)$explained_variance > 0.7))
+
+# plot the top n_feat features based on the ranking by FeatSeek
+plotSelectedFeatures(res, n_features=n_feat)
+```
+
+The low correlation between the top selected features confirm their low 
+redundancy. Using `FeatSeekR` we were able to reduce the dimension of the data 
+to 5 features, while still being able to explain 70% of the variance of the 
+original data.
+>>>>>>> github/master
 
 
 
