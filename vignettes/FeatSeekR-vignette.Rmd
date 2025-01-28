@@ -20,8 +20,7 @@ vignette: >
 
 ```{r setup, message=FALSE}
 library(FeatSeekR)
-library(DmelSGI)
-library(pheatmap)
+library(pheatmap)library(BiocCheck)
 library(SummarizedExperiment)
 ```
 

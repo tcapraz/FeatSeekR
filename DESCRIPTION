@@ -1,7 +1,7 @@
 Package: FeatSeekR
 Type: Package
 Title: FeatSeekR an R package for unsupervised feature selection
-Version: 1.7.0
+Version: 1.7.1
 Authors@R: person("Tuemay", "Capraz",
   email = "tuemay.capraz@embl.de",
   role = c("cre", "aut"),
@@ -21,7 +21,6 @@ Suggests:
     rmarkdown,
     knitr,
     BiocStyle,
-    DmelSGI,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 BugReports: https://github.com/tcapraz/FeatSeekR/issues
